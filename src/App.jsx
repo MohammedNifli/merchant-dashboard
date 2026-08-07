@@ -308,12 +308,8 @@ export default function App() {
   const [token, setToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
   const [loginEmail, setLoginEmail] = useState('owner@cartify-upo9duqv.myshopify.com');
-  const [loginPassword, setLoginPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [authStep, setAuthStep] = useState('email'); // email | magic-sent | set-password
-  const [magicLink, setMagicLink] = useState('');
-  const [loginMode, setLoginMode] = useState('email'); // email | magic
   const loginAttemptsRef = useRef({ count: 0, firstAt: 0 }); // client-side throttle (public endpoint)
 
   // Sidebar & Navigation
@@ -412,13 +408,8 @@ export default function App() {
   // Boot Token check
   useEffect(() => {
     const savedToken = sessionStorage.getItem('speako_access') || localStorage.getItem('speako_token');
-    const params = new URLSearchParams(window.location.search);
-    const magicToken = params.get('token');
 
-    if (magicToken) {
-      // Magic-link verification → /auth/magic-verify returns tokens (+ needs_password)
-      verifyMagicToken(magicToken);
-    } else if (savedToken) {
+    if (savedToken) {
       setToken(savedToken);
       setIsAuthenticated(true);
       fetchTenantData(savedToken);
@@ -1000,94 +991,9 @@ export default function App() {
     }
   };
 
-  // POST /auth/magic-request → one-time email link (dev_link shown if no SMTP)
-  const requestMagicLink = async (email) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/magic-request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMagicLink(data.dev_link || '');
-        addLog('success', data.sent ? 'Magic link sent.' : 'Magic link ready (dev mode).');
-        return true;
-      }
-      setAuthError('Magic link request failed.');
-      return false;
-    } catch (err) {
-      addLog('error', `Magic link error: ${err.message}`);
-      return false;
-    }
-  };
-
-  // POST /auth/magic-verify {token}
-  const verifyMagicToken = async (magicToken) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/magic-verify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: magicToken })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        saveTokens(data);
-        if (data.needs_password) {
-          setAuthStep('set-password');
-        } else {
-          setIsAuthenticated(true);
-          fetchTenantData(data.access_token);
-        }
-      } else {
-        setAuthError('Magic link is invalid or expired.');
-      }
-    } catch (err) {
-      setAuthError(`Magic verification error: ${err.message}`);
-    }
-  };
-
-  // POST /auth/set-password {password, confirm_password}
-  const handleSetPassword = async (e) => {
+  // Auth Submit → email-login
+  const handleLogin = (e) => {
     e.preventDefault();
-    setIsLoggingIn(true);
-    setAuthError('');
-    if (!loginPassword || loginPassword.length < 8) {
-      setAuthError('Password must be at least 8 characters.');
-      setIsLoggingIn(false);
-      return;
-    }
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/set-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getStoredAccess()}` },
-        body: JSON.stringify({ password: loginPassword, confirm_password: loginPassword })
-      });
-      if (response.ok || response.status === 204) {
-        setIsAuthenticated(true);
-        fetchTenantData(getStoredAccess());
-      } else {
-        const errData = await response.json();
-        setAuthError(errData.detail || 'Could not set password.');
-      }
-    } catch (err) {
-      setAuthError(`Set password error: ${err.message}`);
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  // Auth Submit → email-login | magic-request | set-password
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (authStep === 'set-password') return handleSetPassword(e);
-    if (loginMode === 'magic') {
-      setIsLoggingIn(true);
-      const sent = await requestMagicLink(loginEmail);
-      setIsLoggingIn(false);
-      if (sent) setAuthStep('magic-sent');
-      return;
-    }
     return handleEmailLogin(e);
   };
 
@@ -1145,52 +1051,10 @@ export default function App() {
               </div>
             </div>
 
-            {authStep === 'set-password' && (
-              <div className="form-group" style={{ marginBottom: '24px' }}>
-                <label>Choose a Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  required
-                />
-              </div>
-            )}
-
             <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '12px' }} disabled={isLoggingIn}>
-              {isLoggingIn
-                ? 'Working...'
-                : authStep === 'set-password'
-                  ? 'Set Password & Enter'
-                  : loginMode === 'magic'
-                    ? 'Send Magic Link'
-                    : 'Sign In to Dashboard'}
+              {isLoggingIn ? 'Working...' : 'Sign In to Dashboard'}
             </button>
           </form>
-
-          {authStep === 'magic-sent' && (
-            <div style={{ marginBottom: '12px', fontSize: '13px', color: 'var(--text-muted)' }}>
-              A one-time login link has been sent to <strong>{loginEmail}</strong>. Check your inbox and paste the link here, or use the dev link below.
-              {magicLink && (
-                <a href={magicLink} style={{ display: 'block', marginTop: '8px', color: 'var(--primary)', fontWeight: '700', fontSize: '12px' }}>
-                  Open dev magic link →
-                </a>
-              )}
-            </div>
-          )}
-
-          {authStep !== 'set-password' && authStep !== 'magic-sent' && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ width: '100%', marginBottom: '12px' }}
-              onClick={() => setLoginMode(loginMode === 'magic' ? 'email' : 'magic')}
-            >
-              {loginMode === 'magic' ? 'Use Email Login Instead' : 'Continue with Magic Link Instead'}
-            </button>
-          )}
 
           <button onClick={handleSandboxEnter} className="btn btn-secondary" style={{ width: '100%' }}>
             Launch Demo Sandbox (Instant Preview)
