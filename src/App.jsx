@@ -33,182 +33,260 @@ function SparklineChart({ data, color, gradientId }) {
   );
 }
 
-// ── Devices Circular Donut Chart (Image 2 style) ──
-function DevicesDonutChart() {
+// ── Mini Credit Quota Donut Chart (for Top-Right KPI 4) ──
+function MiniCreditDonutChart() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ position: 'relative', width: '130px', height: '130px' }}>
+      <div style={{ position: 'relative', width: '110px', height: '110px' }}>
         <svg viewBox="0 0 100 100" width="100%" height="100%">
-          {/* Desktop Ring Segment (Purple) */}
-          <circle cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" strokeWidth="12" strokeDasharray="120 240" strokeDashoffset="0" transform="rotate(-90 50 50)" />
-          {/* Mobile Ring Segment (Magenta) */}
-          <circle cx="50" cy="50" r="38" fill="none" stroke="#ec4899" strokeWidth="12" strokeDasharray="85 240" strokeDashoffset="-125" transform="rotate(-90 50 50)" />
-          {/* Tablet Ring Segment (Orange) */}
-          <circle cx="50" cy="50" r="38" fill="none" stroke="#f97316" strokeWidth="12" strokeDasharray="35 240" strokeDashoffset="-213" transform="rotate(-90 50 50)" />
-        </svg>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total</span>
-          <span style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-main)' }}>545</span>
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: '12px', marginTop: '12px', fontSize: '11px' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6' }}></span> Desktop 49%
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ec4899' }}></span> Mobile 36%
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f97316' }}></span> Tablet 15%
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ── Multi-Curve Site Traffic Chart (Image 2 style) ──
-function SiteTrafficMultiChart() {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '220px' }}>
-      <svg viewBox="0 0 600 200" width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
-        <defs>
-          <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a855f7" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#a855f7" stopOpacity="0.0" />
-          </linearGradient>
-          <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0" />
-          </linearGradient>
-        </defs>
-
-        {/* Grid horizontal lines */}
-        {[30, 80, 130, 180].map((y, idx) => (
-          <line key={idx} x1="0" y1={y} x2="600" y2={y} stroke="rgba(139, 92, 246, 0.08)" strokeDasharray="3 3" />
-        ))}
-
-        {/* Purple Area Curve (New Visitors) */}
-        <path d="M 0 150 C 50 140, 80 120, 120 110 C 160 100, 200 130, 250 80 C 300 30, 350 100, 400 40 C 450 20, 520 90, 600 50 L 600 190 L 0 190 Z" fill="url(#purpleGradient)" />
-        <path d="M 0 150 C 50 140, 80 120, 120 110 C 160 100, 200 130, 250 80 C 300 30, 350 100, 400 40 C 450 20, 520 90, 600 50" fill="none" stroke="#a855f7" strokeWidth="3" />
-
-        {/* Cyan Area Curve (Returning Visitors) */}
-        <path d="M 0 170 C 60 160, 100 140, 150 130 C 200 120, 240 70, 300 110 C 360 150, 420 90, 470 70 C 530 50, 570 120, 600 100 L 600 190 L 0 190 Z" fill="url(#cyanGradient)" />
-        <path d="M 0 170 C 60 160, 100 140, 150 130 C 200 120, 240 70, 300 110 C 360 150, 420 90, 470 70 C 530 50, 570 120, 600 100" fill="none" stroke="#06b6d4" strokeWidth="3" />
-
-        {/* Hover Point Marker for Aug 16 */}
-        <circle cx="400" cy="40" r="5" fill="#a855f7" stroke="#ffffff" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 8px #a855f7)' }} />
-        <line x1="400" y1="40" x2="400" y2="190" stroke="#a855f7" strokeWidth="1" strokeDasharray="4 2" />
-      </svg>
-
-      {/* Hover Tooltip Card (Aug 16 - 680) */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '360px',
-        background: 'rgba(18, 14, 36, 0.95)',
-        border: '1px solid #a855f7',
-        borderRadius: '8px',
-        padding: '4px 10px',
-        boxShadow: '0 0 15px rgba(168, 85, 247, 0.4)',
-        textAlign: 'center',
-        pointerEvents: 'none'
-      }}>
-        <div style={{ fontSize: '12px', fontWeight: '800', color: '#ffffff' }}>680</div>
-        <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Aug 16</div>
-      </div>
-
-      {/* Month Labels along X-Axis */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '10px', color: 'var(--text-light)' }}>
-        {months.map((m, i) => <span key={i}>{m}</span>)}
-      </div>
-    </div>
-  );
-}
-
-// ── Image 1 Inspired 9805 Radial Gauge Card ──
-function Radial9805Gauge() {
-  return (
-    <div className="gauge-container">
-      <div className="gauge-circle-wrap">
-        <svg viewBox="0 0 100 100" width="100%" height="100%">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="6" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gaugeGrad)" strokeWidth="6" strokeDasharray="200 260" strokeLinecap="round" transform="rotate(-90 50 50)" />
+          <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(139, 92, 246, 0.15)" strokeWidth="12" />
+          <circle cx="50" cy="50" r="38" fill="none" stroke="url(#miniCreditGrad)" strokeWidth="12" strokeDasharray="172 240" strokeLinecap="round" transform="rotate(-90 50 50)" />
           <defs>
-            <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#c084fc" />
-              <stop offset="50%" stopColor="#9333ea" />
-              <stop offset="100%" stopColor="#6366f1" />
+            <linearGradient id="miniCreditGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#a855f7" />
+              <stop offset="100%" stopColor="#06b6d4" />
             </linearGradient>
           </defs>
         </svg>
-        <div className="gauge-circle-inner">
-          <span className="gauge-value">9805</span>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Duration</span>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CREDITS</span>
+          <span style={{ fontSize: '18px', fontWeight: '900', color: 'var(--text-main)' }}>72%</span>
         </div>
       </div>
-      <div style={{ marginTop: '10px', textAlign: 'center' }}>
-        <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-main)' }}>Throughput: 450</div>
-        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Monitoring Overview</div>
+      <div style={{ display: 'flex', gap: '8px', marginTop: '6px', fontSize: '10.5px' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a855f7' }}></span> Voice 960 cr
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06b6d4' }}></span> Text 480 cr
+        </span>
       </div>
     </div>
   );
 }
 
-// ── Middle Time on Site Bar Chart (Image 2 style) ──
-function MiddleTimeBarChart() {
-  const bars = [
-    { day: '30 Jan', h: 40 },
-    { day: '31 Jan', h: 60 },
-    { day: '1 Feb', h: 35 },
-    { day: '2 Feb', h: 75 },
-    { day: '3 Feb', h: 50 },
-    { day: '4 Feb', h: 65 },
-    { day: '5 Feb', h: 80 },
-    { day: '6 Feb', h: 45 },
-    { day: '7 Feb', h: 95, active: true },
-    { day: '8 Feb', h: 70 },
-    { day: '9 Feb', h: 55 },
-    { day: '10 Feb', h: 60 },
-    { day: '11 Feb', h: 85 },
-    { day: '12 Feb', h: 40 },
-  ];
+// ── Dual-Axis Aria Revenue ($) & Conversation Volume (#) Chart ──
+function AriaSalesTrendChart({ trend }) {
+  const raw = Array.isArray(trend) ? trend.filter(Boolean) : [];
+  const points = raw.map((p) => ({
+    label: p.month || p.period || p.label || p.date || p.bucket || '',
+    revenue: Number(p.revenue ?? p.total_revenue ?? p.sales ?? p.total ?? 0),
+    turns: Number(p.message_count ?? p.messages ?? p.turns ?? p.conversation_count ?? p.count ?? 0)
+  }));
+
+  const W = 540, H = 170;
+  const hasData = points.length > 0;
+  const maxRev = Math.max(...points.map((p) => p.revenue), 1);
+  const maxTurns = Math.max(...points.map((p) => p.turns), 1);
+  const xStep = hasData && points.length > 1 ? W / (points.length - 1) : 0;
+  const revY = (v) => H - 8 - (v / maxRev) * (H - 24);
+  const turnsY = (v) => H - 8 - (v / maxTurns) * (H - 24);
+
+  const revPath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(i * xStep).toFixed(1)} ${revY(p.revenue).toFixed(1)}`).join(' ');
+  const turnsPath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${(i * xStep).toFixed(1)} ${turnsY(p.turns).toFixed(1)}`).join(' ');
+  const areaPath = hasData ? `${revPath} L ${W} ${H} L 0 ${H} Z` : '';
+
+  const fmtYAxis = (v) => (v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${Math.round(v)}`);
+
+  if (!hasData) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '230px', fontSize: '12px', color: 'var(--text-muted)' }}>
+        No revenue trend data available yet.
+      </div>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '220px', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flex: 1, paddingBottom: '10px', position: 'relative' }}>
-        {bars.map((b, idx) => (
-          <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, height: '100%', justifyContent: 'flex-end', position: 'relative' }}>
-            {b.active && (
-              <div style={{
-                position: 'absolute',
-                top: `${100 - b.h - 22}%`,
-                background: 'var(--card-bg-solid)',
-                border: '1px solid var(--primary)',
-                borderRadius: '6px',
-                padding: '2px 6px',
-                fontSize: '10.5px',
-                fontWeight: '700',
-                color: '#ffffff',
-                boxShadow: '0 0 10px rgba(168, 85, 247, 0.4)',
-                whiteSpace: 'nowrap'
-              }}>
-                12.51 min
-              </div>
+    <div style={{ position: 'relative', width: '100%', height: '230px' }}>
+      <div style={{ display: 'flex', position: 'relative', width: '100%', height: '190px' }}>
+        {/* Left Y-Axis Labels ($) */}
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '9.5px', color: '#a855f7', fontWeight: '700', paddingRight: '6px', height: '100%' }}>
+          <span>{fmtYAxis(maxRev)}</span>
+          <span>{fmtYAxis(maxRev * 0.66)}</span>
+          <span>{fmtYAxis(maxRev * 0.33)}</span>
+          <span>$0</span>
+        </div>
+
+        {/* SVG Canvas */}
+        <div style={{ flex: 1, position: 'relative', height: '100%' }}>
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+            <defs>
+              <linearGradient id="storeRevGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a855f7" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            {/* Grid lines */}
+            {[20, 65, 110, 155].map((y, idx) => (
+              <line key={idx} x1="0" y1={y} x2={W} y2={y} stroke="rgba(139, 92, 246, 0.08)" strokeDasharray="3 3" />
+            ))}
+
+            {/* Solid Purple Curve: Aria Assisted Sales ($) */}
+            {areaPath && <path d={areaPath} fill="url(#storeRevGradient)" />}
+            {revPath && <path d={revPath} fill="none" stroke="#a855f7" strokeWidth="3" />}
+
+            {/* Dotted Cyan Curve: Conversation Count (# Dialogue Turns) */}
+            {turnsPath && <path d={turnsPath} fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeDasharray="5 4" />}
+
+            {/* Active Point Markers */}
+            {points.length > 0 && (
+              <>
+                <circle cx={W} cy={revY(points[points.length - 1].revenue)} r="5" fill="#a855f7" stroke="#ffffff" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 8px #a855f7)' }} />
+                <circle cx={W} cy={turnsY(points[points.length - 1].turns)} r="4" fill="#06b6d4" stroke="#ffffff" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 8px #06b6d4)' }} />
+                <line x1={W} y1={revY(points[points.length - 1].revenue)} x2={W} y2={H} stroke="rgba(168, 85, 247, 0.4)" strokeWidth="1" strokeDasharray="4 2" />
+              </>
             )}
+          </svg>
+
+          {/* Interactive Dual-Axis Tooltip Callout */}
+          {points.length > 0 && (
             <div style={{
-              width: '14px',
-              height: `${b.h}%`,
-              background: b.active ? 'linear-gradient(180deg, #c084fc 0%, #7c3aed 100%)' : 'rgba(139, 92, 246, 0.25)',
-              borderRadius: '4px 4px 0 0',
-              boxShadow: b.active ? '0 0 12px rgba(168, 85, 247, 0.5)' : 'none',
+              position: 'absolute',
+              top: '4px',
+              right: '8px',
+              background: 'rgba(18, 14, 36, 0.95)',
+              border: '1px solid #a855f7',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              boxShadow: '0 0 15px rgba(168, 85, 247, 0.4)',
+              fontSize: '10.5px',
+              pointerEvents: 'none',
+              zIndex: 10
+            }}>
+              <div style={{ fontWeight: '800', color: '#ffffff', marginBottom: '2px' }}>
+                {points[points.length - 1].label || 'Latest'} Point
+              </div>
+              <div style={{ color: '#a855f7', fontWeight: '700' }}>Sales: ${points[points.length - 1].revenue.toLocaleString()}</div>
+              <div style={{ color: '#06b6d4', fontWeight: '700' }}>Dialogue Turns: {points[points.length - 1].turns.toLocaleString()}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Y-Axis Labels (Conversation Count #) */}
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize: '9.5px', color: '#06b6d4', fontWeight: '700', paddingLeft: '6px', height: '100%' }}>
+          <span>{Math.round(maxTurns)}</span>
+          <span>{Math.round(maxTurns * 0.66)}</span>
+          <span>{Math.round(maxTurns * 0.33)}</span>
+          <span>0</span>
+        </div>
+      </div>
+
+      {/* Month Labels along X-Axis */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: '32px', paddingRight: '28px', marginTop: '6px', fontSize: '10px', color: 'var(--text-light)' }}>
+        {points.map((p, i) => <span key={i}>{p.label}</span>)}
+      </div>
+    </div>
+  );
+}
+
+// ── Customer Intent Distribution (Top 5 & Expandable 9 Classes) ──
+function CustomerIntentDistributionChart() {
+  const [showAllIntents, setShowAllIntents] = useState(false);
+
+  const primaryIntents = [
+    { label: 'Product Discovery & Search', pct: 45, count: '648 queries', color: 'linear-gradient(90deg, #6366f1, #4f46e5)', icon: '🔍' },
+    { label: 'Cart & Checkout Actions', pct: 28, count: '403 queries', color: 'linear-gradient(90deg, #06b6d4, #3b82f6)', icon: '🛒' },
+    { label: 'Order Tracking', pct: 15, count: '216 queries', color: 'linear-gradient(90deg, #ec4899, #f43f5e)', icon: '📦' },
+    { label: 'Inventory & Variant Checks', pct: 7, count: '101 queries', color: 'linear-gradient(90deg, #10b981, #059669)', icon: '🏷️' },
+    { label: 'Conversational Discounts Applied', pct: 5, count: '72 queries', color: 'linear-gradient(90deg, #f59e0b, #d97706)', icon: '⚡' },
+  ];
+
+  const extraIntents = [
+    { label: 'Greetings & Chitchat', pct: 2, count: '29 queries', color: 'rgba(99, 102, 241, 0.4)', icon: '💬' },
+    { label: 'Store Info & Policies', pct: 1.5, count: '22 queries', color: 'rgba(6, 182, 212, 0.4)', icon: 'ℹ️' },
+    { label: 'Product Comparisons', pct: 1, count: '14 queries', color: 'rgba(236, 72, 153, 0.4)', icon: '⚖️' },
+    { label: 'FAQ Redirects', pct: 0.5, count: '7 queries', color: 'rgba(245, 158, 11, 0.4)', icon: '❓' },
+  ];
+
+  const displayedIntents = showAllIntents ? [...primaryIntents, ...extraIntents] : primaryIntents;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {displayedIntents.map((item, idx) => (
+        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11.5px' }}>
+            <span style={{ fontWeight: '600', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>{item.icon}</span> {item.label}
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              <strong style={{ color: 'var(--text-main)', fontSize: '11.5px' }}>{item.pct}%</strong> ({item.count})
+            </span>
+          </div>
+          <div style={{ width: '100%', height: '7px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+            <div style={{
+              width: `${item.pct}%`,
+              height: '100%',
+              background: item.color,
+              borderRadius: '6px',
               transition: 'var(--transition)'
             }} />
           </div>
-        ))}
+        </div>
+      ))}
+
+      <button 
+        onClick={() => setShowAllIntents(!showAllIntents)} 
+        style={{
+          alignSelf: 'center',
+          background: 'none',
+          border: 'none',
+          color: 'var(--primary)',
+          fontSize: '11px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          marginTop: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px'
+        }}
+      >
+        {showAllIntents ? '▲ Show Top 5 Intents' : 'View All 9 Intent Classes ∨'}
+      </button>
+    </div>
+  );
+}
+
+// ── Support Ticket Escalation & Heat Rating Donut Chart ──
+function SupportEscalationDonutChart() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%', padding: '4px 0' }}>
+        <div style={{ position: 'relative', width: '115px', height: '115px' }}>
+          <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="11" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" strokeWidth="11" strokeDasharray="195 240" strokeLinecap="round" transform="rotate(-90 50 50)" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" strokeWidth="11" strokeDasharray="36 240" strokeDashoffset="-196" strokeLinecap="round" transform="rotate(-90 50 50)" />
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#ef4444" strokeWidth="11" strokeDasharray="8 240" strokeDashoffset="-232" strokeLinecap="round" transform="rotate(-90 50 50)" />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: '20px', fontWeight: '900', color: 'var(--text-main)' }}>82%</span>
+            <span style={{ fontSize: '8.5px', color: 'var(--success)', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.04em' }}>AUTO-RESOLVED</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11.5px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+            <span style={{ color: 'var(--text-muted)' }}>Automated by Aria</span>
+            <strong style={{ marginLeft: 'auto', color: '#10b981' }}>82%</strong>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}></span>
+            <span style={{ color: 'var(--text-muted)' }}>Escalated - Hot Heat</span>
+            <strong style={{ marginLeft: 'auto', color: '#ef4444' }}>3%</strong>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}></span>
+            <span style={{ color: 'var(--text-muted)' }}>Escalated - Warm/Cold</span>
+            <strong style={{ marginLeft: 'auto', color: '#f59e0b' }}>15%</strong>
+          </div>
+        </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--card-border)', paddingTop: '6px', fontSize: '10px', color: 'var(--text-light)' }}>
-        {bars.map((b, idx) => <span key={idx}>{b.day.split(' ')[0]}</span>)}
+
+      {/* Clean Unbordered Note */}
+      <div style={{ marginTop: '12px', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
+        ✨ <strong>1,180 queries</strong> resolved without human agent intervention.
       </div>
     </div>
   );
@@ -386,6 +464,10 @@ export default function App() {
   const [agentProducts, setAgentProducts] = useState([]);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
 
+  // Dashboard Metrics State (from GET /merchant/dashboard/metrics)
+  const [dashMetrics, setDashMetrics] = useState(null);
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState(false);
+
   // Billing State
   const [billingPlans, setBillingPlans] = useState([]);
   const [billingSubscription, setBillingSubscription] = useState(null);
@@ -401,6 +483,11 @@ export default function App() {
   const [ticketStatusFilter, setTicketStatusFilter] = useState('open');
   const [expandedTicket, setExpandedTicket] = useState(null);
   const [ticketNoteInput, setTicketNoteInput] = useState('');
+
+  // Ticket Action Modals State (View Transcript & Live Takeover)
+  const [viewTicketModal, setViewTicketModal] = useState(null);
+  const [takeoverModal, setTakeoverModal] = useState(null);
+  const [takeoverMessage, setTakeoverMessage] = useState('');
 
   const [offers, setOffers] = useState([]);
   const [isLoadingOffers, setIsLoadingOffers] = useState(false);
@@ -451,6 +538,7 @@ export default function App() {
         addLog('success', `Retrieved profile for tenant: ${data.name}`);
         fetchConversations(authToken);
         fetchAnalytics(authToken);
+        fetchDashboardMetrics(authToken);
       } else {
         addLog('error', 'Failed to fetch tenant data.');
       }
@@ -481,10 +569,57 @@ export default function App() {
     }
   };
 
+  // API Call: Dashboard Metrics (GET /merchant/dashboard/metrics)
+  const fetchDashboardMetrics = async (authToken = token) => {
+    setIsLoadingDashboard(true);
+    try {
+      const response = await authFetch('/merchant/dashboard/metrics', { headers: { 'Authorization': `Bearer ${authToken}` } });
+      if (response.ok) {
+        const json = await response.json();
+        setDashMetrics(json.data || json);
+        addLog('success', 'Dashboard metrics loaded.');
+      } else {
+        addLog('error', `Dashboard metrics failed (HTTP ${response.status}). Using fallback data.`);
+      }
+    } catch (err) {
+      addLog('error', `Dashboard metrics error: ${err.message}`);
+    } finally {
+      setIsLoadingDashboard(false);
+    }
+  };
+
   const refreshDashboard = () => {
     fetchAnalytics();
+    fetchDashboardMetrics();
     addLog('info', 'Refreshed dashboard metrics.');
   };
+
+  // ── Dashboard Metrics Accessors (defensive against missing/alternate field names) ──
+  const dm = dashMetrics || {};
+  const dmKpis = dm.kpis || {};
+  const dmRev = dmKpis.revenue || {};
+  const dmConv = dmKpis.conversions || {};
+  const dmEng = dmKpis.engagement || {};
+  const dmPlan = dmKpis.plan_usage || {};
+  const dmPulse = (dm.performance_hub || {}).live_pulse || {};
+  const dmTrend = (dm.performance_hub || {}).revenue_dialogue_trend || [];
+  const dmProducts = (dm.operational_desk || {}).top_converted_products || [];
+  const dmEsc = (dm.operational_desk || {}).support_escalations || {};
+  const dmTickets = dmEsc.recent_tickets || [];
+
+  const toMoney = (v, fb) => {
+    if (v == null || isNaN(Number(v))) return fb;
+    return Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
+  };
+  const toPct = (v, fb) => {
+    if (v == null || isNaN(Number(v))) return fb;
+    return `${Number(v).toFixed(1)}%`;
+  };
+  const planPct = dmPlan.max_conversations ? Math.min(100, Math.round((dmPlan.credits_used / dmPlan.max_conversations) * 100)) : 0;
+  const escAuto = toPct(dmEsc.auto_resolved_percentage ?? dmEsc.auto_resolved_pct, '82%');
+  const escEscalated = toPct(dmEsc.escalated_percentage ?? dmEsc.escalated_pct, '18%');
+  const statusText = dmPulse.status_message || 'All systems operational • Redis & WS Connected';
+  const isStatusOk = !dmPulse.status_message || !/down|offline|disconnect|error/i.test(dmPulse.status_message);
 
   // API Call: Save Config
   const handleSaveSettings = async (e) => {
@@ -1071,8 +1206,8 @@ export default function App() {
       <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <a href="#" className="sidebar-logo">
-            <span className="sidebar-logo-box">V</span>
-            {!sidebarCollapsed && <span>VALUE ANALYTICS</span>}
+            <span className="sidebar-logo-box">S</span>
+            {!sidebarCollapsed && <span>SPEAKO AI</span>}
           </a>
           <button className="sidebar-toggle-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1095,14 +1230,14 @@ export default function App() {
             <div className={`sidebar-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => { setActiveTab('orders'); setOrderStatusFilter(''); fetchOrders(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">📦</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Orders</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Orders & Sales</span>}
               </div>
             </div>
 
             <div className={`sidebar-item ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => { setActiveTab('tickets'); setTicketStatusFilter('open'); fetchTickets(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">🎫</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Tickets</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Support Tickets</span>}
               </div>
               {!sidebarCollapsed && <span className="sidebar-badge">2</span>}
             </div>
@@ -1110,14 +1245,14 @@ export default function App() {
             <div className={`sidebar-item ${activeTab === 'offers' ? 'active' : ''}`} onClick={() => { setActiveTab('offers'); fetchOffers(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">🏷️</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Offers</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Promotions & Offers</span>}
               </div>
             </div>
 
             <div className={`sidebar-item ${activeTab === 'conversations' ? 'active' : ''}`} onClick={() => { setActiveTab('conversations'); fetchConversations(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">💬</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Messages</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Conversations & Transcripts</span>}
               </div>
               {!sidebarCollapsed && <span className="sidebar-badge">8</span>}
             </div>
@@ -1129,14 +1264,14 @@ export default function App() {
             <div className={`sidebar-item ${activeTab === 'ai-config' ? 'active' : ''}`} onClick={() => setActiveTab('ai-config')}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">🤖</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Personality Config</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Persona & Voice Config</span>}
               </div>
             </div>
 
             <div className={`sidebar-item ${activeTab === 'widget' ? 'active' : ''}`} onClick={() => setActiveTab('widget')}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">🎨</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Widget Design</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Widget Customization</span>}
               </div>
             </div>
           </div>
@@ -1144,31 +1279,24 @@ export default function App() {
           <div className="sidebar-nav-section">
             {!sidebarCollapsed && <div className="sidebar-nav-title">Store & Setup</div>}
             
-            <div className={`sidebar-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-              <div className="sidebar-item-left">
-                <span className="sidebar-item-icon">⚙️</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">General Settings</span>}
-              </div>
-            </div>
-
             <div className={`sidebar-item ${activeTab === 'integrations' ? 'active' : ''}`} onClick={() => setActiveTab('integrations')}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">🔗</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Integrations</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Store Integration</span>}
               </div>
             </div>
 
             <div className={`sidebar-item ${activeTab === 'diagnostics' ? 'active' : ''}`} onClick={() => setActiveTab('diagnostics')}>
               <div className="sidebar-item-left">
-                <span className="sidebar-item-icon">🩺</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Diagnostics</span>}
+                <span className="sidebar-item-icon">⚡</span>
+                {!sidebarCollapsed && <span className="sidebar-item-label">Catalog & Sync Status</span>}
               </div>
             </div>
 
             <div className={`sidebar-item ${activeTab === 'billing' ? 'active' : ''}`} onClick={() => { setActiveTab('billing'); fetchBilling(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">💳</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Billing & Limits</span>}
+                {!sidebarCollapsed && <span className="sidebar-item-label">Billing & Usage</span>}
               </div>
             </div>
           </div>
@@ -1189,40 +1317,37 @@ export default function App() {
       {/* ── Main Panel Wrapper ── */}
       <div className="main-wrapper">
         {/* Top Navbar */}
-        <header className="topnav">
-          <div className="topnav-left">
-            <h2 className="topnav-title">Dashboard</h2>
-            <div className="topnav-pills">
-              <button className="pill-filter active">Overview ∨</button>
-              <button className="pill-filter">Last week ∨</button>
+        <header className="topnav" style={{ height: '64px', padding: '0 32px' }}>
+          <div className="topnav-left" style={{ gap: '16px' }}>
+            <h2 className="topnav-title" style={{ fontSize: '15px', letterSpacing: '0.05em', fontWeight: '700' }}>SPEAKO</h2>
+            <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+            <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.03)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              Store: Cartify Shopify
+            </span>
+          </div>
+
+          <div className="topnav-actions" style={{ gap: '16px' }}>
+            <button className="pill-filter" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-main)', fontSize: '12px', padding: '6px 12px' }}>
+              Last 30 Days ∨
+            </button>
+            
+            <div className="topnav-search" style={{ width: '240px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>🔍</span>
+              <input type="text" placeholder="Search..." style={{ fontSize: '13px' }} />
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '4px' }}>⌘K</span>
             </div>
-          </div>
 
-          <div className="topnav-search">
-            <span>🔍</span>
-            <input type="text" placeholder="Search analytics, orders, clients..." />
-            <span style={{ fontSize: '10px', color: 'var(--text-light)', border: '1px solid var(--card-border)', padding: '2px 6px', borderRadius: '4px' }}>⌘K</span>
-          </div>
-
-          <div className="topnav-actions">
-            {/* Theme Toggle */}
-            <button className="topnav-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Toggle Light/Dark Theme">
+            <button className="topnav-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Toggle Theme" style={{ background: 'transparent', border: 'none' }}>
               {theme === 'dark' ? '🌙' : '☀️'}
             </button>
 
-            {/* Notification Bell */}
-            <button className="topnav-btn" onClick={() => alert('No new notifications')} title="Notifications">
+            <button className="topnav-btn" onClick={() => alert('Notifications')} title="Notifications" style={{ background: 'transparent', border: 'none' }}>
               🔔
-              <span className="topnav-btn-badge"></span>
+              <span className="topnav-btn-badge" style={{ background: 'var(--primary)' }}></span>
             </button>
 
-            {/* Profile Dropdown */}
-            <div className="profile-dropdown">
-              <div className="avatar">MB</div>
-              <div className="profile-info">
-                <span className="profile-name">Malena Bayer</span>
-                <span className="profile-role">Super Admin</span>
-              </div>
+            <div className="avatar" style={{ width: '32px', height: '32px', cursor: 'pointer', background: 'var(--primary-gradient)', fontSize: '12px' }}>
+              MB
             </div>
           </div>
         </header>
@@ -1242,306 +1367,307 @@ export default function App() {
             </div>
           )}
 
-          {/* ── TAB: DASHBOARD OVERVIEW (Image 1 & 2 layout) ── */}
+          {/* ── TAB: DASHBOARD OVERVIEW (Stripe/Vercel Aesthetic) ── */}
           {activeTab === 'dashboard' && (
-            <div>
-              {/* Top Row: 4 KPI Cards with Sparklines */}
-              <div className="grid-cols-4">
-                {/* KPI 1: Sessions */}
-                <div className="card metric-card">
-                  <div className="metric-header">
-                    <span className="metric-title">Sessions</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last week ∨</button>
+            <div style={{ padding: '8px 0' }}>
+              {/* ── ROW 1: TOP KPI STAT CARDS (grid-cols-4 gap-6) ── */}
+              <div className="dashboard-grid-4">
+                {/* KPI 1: ARIA REVENUE */}
+                <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Aria Revenue</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
+                      {tenant.currency_symbol}{dmRev.total_amount != null ? toMoney(dmRev.total_amount) : toMoney(agentSold?.agent_revenue, '14,280.00')}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: '500', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                      ↑ {dmRev.lift_percentage != null ? toPct(dmRev.lift_percentage, '+50.3%') : '+50.3%'}
+                    </span>
                   </div>
-                  <div className="metric-value-row">
-                    <span className="metric-value">856</span>
-                    <span className="metric-change negative">↓ -12%</span>
-                  </div>
-                  <div className="sparkline-wrapper">
-                    <SparklineChart data={[40, 55, 30, 65, 80, 45, 90, 70, 856]} color="#f97316" gradientId="sparkOrange" />
-                  </div>
-                </div>
-
-                {/* KPI 2: Users / Conversations */}
-                <div className="card metric-card">
-                  <div className="metric-header">
-                    <span className="metric-title">Users</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last week ∨</button>
-                  </div>
-                  <div className="metric-value-row">
-                    <span className="metric-value">{summary.total_conversations}</span>
-                    <span className="metric-change positive">↑ +23%</span>
-                  </div>
-                  <div className="sparkline-wrapper">
-                    <SparklineChart data={[30, 45, 60, 40, 75, 90, 80, 95, 523]} color="#ec4899" gradientId="sparkMagenta" />
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {dmRev.share_of_sales_percentage != null ? toPct(dmRev.share_of_sales_percentage, '50.3%') : '50.3%'} of total sales
                   </div>
                 </div>
 
-                {/* KPI 3: Time spent / Revenue */}
-                <div className="card metric-card">
-                  <div className="metric-header">
-                    <span className="metric-title">Time spent / Revenue</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last week ∨</button>
+                {/* KPI 2: ARIA CONVERSIONS */}
+                <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Aria Orders</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
+                      {dmConv.order_count != null ? Number(dmConv.order_count).toLocaleString() : (agentSold?.agent_order_count || '184')}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: '500', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
+                      {dmConv.lift_percentage != null ? toPct(dmConv.lift_percentage, '+18.4%') : '+18.4%'} Lift
+                    </span>
                   </div>
-                  <div className="metric-value-row">
-                    <span className="metric-value">{tenant.currency_symbol}{(summary.total_revenue / 1000).toFixed(2)}k</span>
-                    <span className="metric-change positive">↑ {(summary.conversion_rate * 100).toFixed(1)}% conv.</span>
-                  </div>
-                  <div className="sparkline-wrapper">
-                    <SparklineChart
-                      data={metrics.length ? metrics.map(m => m.revenue || 0) : [20, 35, 50, 40, 65, 55, 75, 85, 95]}
-                      color="#06b6d4"
-                      gradientId="sparkCyan"
-                    />
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {tenant.currency_symbol}{dmConv.avg_order_value != null ? toMoney(dmConv.avg_order_value) : '77.60'} Avg Order Value
                   </div>
                 </div>
 
-                {/* KPI 4: Devices Circular Donut Chart */}
-                <div className="card metric-card">
-                  <div className="metric-header">
-                    <span className="metric-title">Devices</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Today ∨</button>
+                {/* KPI 3: VOICE VS TEXT SPLIT */}
+                <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Voice vs Text</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
+                      {dmEng.voice_split != null ? `${toPct(dmEng.voice_split, '0%')} / ${toPct(dmEng.text_split, '0%')}` : '68% / 32%'}
+                    </span>
                   </div>
-                  <DevicesDonutChart />
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {dmEng.avg_voice_turn_seconds != null ? `Avg Voice Turn: ${Math.round(Number(dmEng.avg_voice_turn_seconds))}s` : 'Avg Voice Turn: 42s'}
+                  </div>
+                </div>
+
+                {/* KPI 4: PLAN USAGE & CREDITS */}
+                <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Plan Usage</div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
+                      {dmPlan.credits_used != null ? Number(dmPlan.credits_used).toLocaleString() : '1,440'} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {dmPlan.max_conversations != null ? Number(dmPlan.max_conversations).toLocaleString() : '2,000'}</span>
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: `${planPct || 72}%`, height: '100%', background: 'var(--primary)' }}></div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {planPct || 72}% Used • {dmPlan.plan_name || 'Growth Plan'}
+                  </div>
                 </div>
               </div>
 
-              {/* ── AI ATTRIBUTION PANEL (from /analytics/agent-sold + agent-products + metrics) ── */}
-              <div className="grid-cols-2" style={{ marginBottom: '24px' }}>
-                {/* AI Sold Stats */}
-                <div className="card">
-                  <div className="card-header">
-                    <span className="card-title">AI Attribution</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Agent vs Store</button>
+              {/* ── ROW 2: PRIMARY PERFORMANCE HUB (grid-cols-12 gap-6) ── */}
+              <div className="dashboard-grid-12">
+                {/* Left Card: Revenue & Dialogue Trend (col-span-8) */}
+                <div className="card col-span-8">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>Revenue & Dialogue Volume</span>
+                    <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6' }}></span> Sales ($)</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06b6d4' }}></span> Turns (#)</span>
+                    </div>
                   </div>
-                  {agentSold ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                      <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Agent Revenue</div>
-                        <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--primary)' }}>
-                          {tenant.currency_symbol}{(agentSold.agent_revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Agent Orders</div>
-                        <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-main)' }}>{agentSold.agent_order_count || 0}</div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Agent AOV</div>
-                        <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-main)' }}>
-                          {tenant.currency_symbol}{(agentSold.agent_aov || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Share of Revenue</div>
-                        <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--secondary)' }}>
-                          {((agentSold.share_of_revenue || 0) * 100).toFixed(1)}%
-                        </div>
-                      </div>
-                      {agentSold.boost_percent != null && (
-                        <div style={{ gridColumn: '1 / -1', fontSize: '12.5px', color: 'var(--success)' }}>
-                          ↑ {tenant.currency_symbol}{(agentSold.total_revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} total revenue boosted by {(agentSold.boost_percent * 100).toFixed(1)}% via AI
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div style={{ padding: '18px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
-                      {isLoadingAnalytics ? 'Loading AI attribution...' : 'No AI-attributed sales data yet. New orders must flow through the Storefront cart with source="agent".'}
-                    </div>
-                  )}
+                  <AriaSalesTrendChart trend={dmTrend} />
                 </div>
 
-                {/* Products sold via AI */}
-                <div className="card">
-                  <div className="card-header">
-                    <span className="card-title">Products Sold via AI</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Top sellers</button>
+                {/* Right Card: Live Storefront Pulse (col-span-4) */}
+                <div className="card col-span-4" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>Live Storefront Pulse</span>
+                    <span style={{ fontSize: '12px', fontWeight: '500', color: isStatusOk ? '#10b981' : '#ef4444', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isStatusOk ? '#10b981' : '#ef4444', boxShadow: `0 0 8px ${isStatusOk ? '#10b981' : '#ef4444'}` }}></span> Live
+                    </span>
                   </div>
+
+                  <div className="pulse-grid" style={{ flex: 1, marginTop: '24px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Active Shoppers</div>
+                      <div style={{ fontSize: '32px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{dmPulse.active_shoppers ?? 34}</div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Voice Streams</div>
+                      <div style={{ fontSize: '32px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{dmPulse.voice_streams ?? 6}</div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Managed Carts</div>
+                      <div style={{ fontSize: '32px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{dmPulse.managed_carts ?? 18}</div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Pending Checkouts</div>
+                      <div style={{ fontSize: '32px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>{dmPulse.pending_checkouts ?? 5}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                    {statusText}
+                  </div>
+                </div>
+              </div>
+
+              {/* ── ROW 3: SECONDARY OPERATIONAL DESK (grid-cols-12 gap-6) ── */}
+              <div className="dashboard-grid-12">
+                {/* Left Card: Top Converted Products (col-span-6) */}
+                <div className="card col-span-6">
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)', marginBottom: '24px' }}>Top Converted Products</div>
                   <div className="table-responsive">
-                    <table className="table">
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
-                        <tr>
-                          <th>Product</th>
-                          <th style={{ textAlign: 'right' }}>Qty</th>
-                          <th style={{ textAlign: 'right' }}>Revenue</th>
+                      <tr>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>Promo</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Qty</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(dmProducts.length
+                        ? dmProducts
+                        : [
+                          { name: 'Leather Jacket', qty: 42, rev: 5460.00, badge: '15% Off' },
+                          { name: 'Running Shoes', qty: 28, rev: 3360.00, badge: 'Dead-Stock' },
+                          { name: 'Denim Jeans', qty: 19, rev: 1710.00, badge: 'Bundle' },
+                          { name: 'Wireless Earbuds', qty: 15, rev: 1350.00, badge: 'Flash Sale' },
+                        ]).map((p, idx, arr) => {
+                        const name = p.title || p.product_title || p.name || p.product_name || p.product || '—';
+                        const qty = p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
+                        const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
+                        const badge = p.offer_title || p.offer_name || p.badge || p.promo || p.offer || '';
+                        return (
+                        <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
+                          <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>{name}</td>
+                          <td style={{ padding: '16px 0', textAlign: 'center' }}>
+                            {badge ? (
+                              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)' }}>{badge}</span>
+                            ) : <span style={{ fontSize: '11px', color: 'var(--text-light)' }}>—</span>}
+                          </td>
+                          <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>{Number(qty).toLocaleString()}</td>
+                          <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>
+                            {tenant.currency_symbol}{toMoney(rev, '0.00')}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {agentProducts.length === 0 ? (
-                          <tr><td colSpan="3" style={{ color: 'var(--text-muted)', padding: '16px' }}>No agent-sold products yet.</td></tr>
-                        ) : (
-                          agentProducts.map((p, i) => (
-                            <tr key={p.product_id || i}>
-                              <td style={{ fontWeight: '600' }}>{p.name}</td>
-                              <td style={{ textAlign: 'right', color: 'var(--primary)', fontWeight: '700' }}>{p.quantity}</td>
-                              <td style={{ textAlign: 'right', fontWeight: '700' }}>{tenant.currency_symbol}{(p.revenue || 0).toFixed(2)}</td>
-                            </tr>
-                          ))
-                        )}
+                        );
+                      })}
                       </tbody>
                     </table>
                   </div>
                 </div>
-              </div>
 
-              {/* Middle Row: Site Traffic & Real-time Data + Gauge / Pages Grid */}
-              <div className="grid-cols-2">
-                {/* Site Traffic & Real-time Multi-curve Chart */}
-                <div className="card">
-                  <div className="card-header">
-                    <span className="card-title">Site traffic</span>
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '11.5px', alignItems: 'center' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#a855f7' }}></span> New visitor
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06b6d4' }}></span> Returning visitor
-                      </span>
-                      <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>This year ∨</button>
+                {/* Right Card: Support Escalations & Tickets (col-span-6) */}
+                <div className="card col-span-6">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>Support Escalations</span>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span><strong style={{ color: '#10b981' }}>{escAuto}</strong> Auto-Resolved</span>
+                      <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
+                      <span><strong style={{ color: 'var(--text-main)' }}>{escEscalated}</strong> Escalated</span>
                     </div>
                   </div>
-                  <SiteTrafficMultiChart />
-
-                  {/* Real-time Data breakdown row */}
-                  <div style={{ marginTop: '20px', borderTop: '1px solid var(--card-border)', paddingTop: '16px' }}>
-                    <div style={{ fontSize: '13px', fontWeight: '700', marginBottom: '12px', color: 'var(--text-main)' }}>Real-time Data</div>
-                    <div className="realtime-list">
-                      <div className="realtime-item">
-                        <span className="realtime-label">Online visitors</span>
-                        <div><span className="realtime-val">545</span><span className="realtime-max">max 685</span></div>
-                      </div>
-                      <div className="realtime-item">
-                        <span className="realtime-label">New visitors</span>
-                        <div><span className="realtime-val">421</span><span className="realtime-max">max 568</span></div>
-                      </div>
-                      <div className="realtime-item">
-                        <span className="realtime-label">Sessions</span>
-                        <div><span className="realtime-val">984</span><span className="realtime-max">max 1256</span></div>
-                      </div>
-                      <div className="realtime-item">
-                        <span className="realtime-label">Page views</span>
-                        <div><span className="realtime-val">134</span><span className="realtime-max">max 287</span></div>
-                      </div>
-                    </div>
+                  <div className="table-responsive">
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                      <thead>
+                      <tr>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ticket</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Customer & Issue</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Heat</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(dmTickets.length
+                        ? dmTickets
+                        : [
+                          { id: 'TK-1001', name: 'David Miller', issue: 'Delivery Issue', heat: 'Hot', heatColor: '#ef4444', transcript: '...' },
+                          { id: 'TK-1002', name: 'Elena Rostova', issue: 'Restock Query', heat: 'Warm', heatColor: '#f59e0b', transcript: '...' },
+                          { id: 'TK-1003', name: 'Marcus Chen', issue: 'Refund Request', heat: 'Warm', heatColor: '#f59e0b', transcript: '...' },
+                          { id: 'TK-1004', name: 'Sarah Jenkins', issue: 'Discount Code', heat: 'Cold', heatColor: '#3b82f6', transcript: '...' },
+                        ]).map((t, idx, arr) => {
+                        const ticket = {
+                          id: t.ticket_number || t.id || t.ticket_id || t.tk_number || '—',
+                          name: t.customer_name || t.customer || t.name || '—',
+                          issue: t.issue_type || t.issue || t.category || t.issue_summary || '—',
+                          heat: t.heat || 'Cold',
+                          heatColor: t.heat_color_hex || { Hot: '#ef4444', Warm: '#f59e0b', Cold: '#3b82f6' }[t.heat || 'Cold'] || '#3b82f6',
+                          transcript: t.transcript_snippet || t.snippet || t.transcript || 'No transcript available.'
+                        };
+                        return (
+                        <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
+                          <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--primary)' }}>
+                            <a href={`#${ticket.id}`} onClick={(e) => { e.preventDefault(); setViewTicketModal(ticket); }} style={{ color: 'inherit', textDecoration: 'none' }}>{ticket.id}</a>
+                          </td>
+                          <td style={{ padding: '16px 0', fontSize: '13px', color: 'var(--text-main)' }}>
+                            {ticket.name} <span style={{ color: 'var(--text-muted)' }}>• {ticket.issue}</span>
+                          </td>
+                          <td style={{ padding: '16px 0' }}>
+                            <span style={{ fontSize: '11px', fontWeight: '500', color: ticket.heatColor }}>{ticket.heat}</span>
+                          </td>
+                          <td style={{ padding: '16px 0', textAlign: 'right' }}>
+                            <button 
+                              onClick={() => setTakeoverModal(ticket)}
+                              style={{ background: 'var(--primary)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '14px', fontSize: '11px', fontWeight: '500', cursor: 'pointer' }}
+                            >
+                              Take Over
+                            </button>
+                          </td>
+                        </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                   </div>
                 </div>
+              </div>
 
-                {/* Middle Time on Site + Pages Ranked List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {/* Circular Radial Gauge Card (Image 1 style) */}
-                  <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-                    <div>
-                      <div className="card-title" style={{ marginBottom: '8px' }}>Monitoring Overview</div>
-                      <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', maxWidth: '180px' }}>
-                        Live transactions response time & throughput.
-                      </p>
-                      <div style={{ marginTop: '12px', fontSize: '18px', fontWeight: '800', color: 'var(--primary)' }}>
-                        6.07s <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'normal' }}>Response time</span>
-                      </div>
-                    </div>
-                    <Radial9805Gauge />
-                  </div>
-
-                  {/* Middle Time on Site Bar Chart */}
-                  <div className="card">
+              {/* ── TICKET TRANSCRIPT MODAL ── */}
+              {viewTicketModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                  <div className="card" style={{ maxWidth: '550px', width: '100%', border: '1px solid var(--primary)' }}>
                     <div className="card-header">
-                      <span className="card-title">Middle time on site</span>
-                      <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last 14 days ∨</button>
-                    </div>
-                    <MiddleTimeBarChart />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Row: Pages Table & Social Traffic Donut */}
-              <div className="grid-cols-2">
-                {/* Traffic from Social */}
-                <div className="card">
-                  <div className="card-header">
-                    <span className="card-title">Traffic from social</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last week ∨</button>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '10px 0' }}>
-                    <div style={{ position: 'relative', width: '140px', height: '140px' }}>
-                      <svg viewBox="0 0 100 100" width="100%" height="100%">
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#f97316" strokeWidth="12" strokeDasharray="110 240" />
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#ec4899" strokeWidth="12" strokeDasharray="50 240" strokeDashoffset="-115" />
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#3b82f6" strokeWidth="12" strokeDasharray="35 240" strokeDashoffset="-170" />
-                        <circle cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" strokeWidth="12" strokeDasharray="25 240" strokeDashoffset="-210" />
-                      </svg>
-                      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total</span>
-                        <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-main)' }}>1578</span>
-                      </div>
+                      <span className="card-title">🎙️ Ticket Transcript: {viewTicketModal.id} ({viewTicketModal.name})</span>
+                      <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '18px' }} onClick={() => setViewTicketModal(null)}>×</button>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '160px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f97316' }}></span> YouTube
-                        </span>
-                        <span style={{ fontWeight: '700' }}>710 / 45%</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '160px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ec4899' }}></span> Instagram
-                        </span>
-                        <span style={{ fontWeight: '700' }}>316 / 20%</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '160px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6' }}></span> LinkedIn
-                        </span>
-                        <span style={{ fontWeight: '700' }}>237 / 15%</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '160px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
-                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6' }}></span> Facebook
-                        </span>
-                        <span style={{ fontWeight: '700' }}>174 / 11%</span>
-                      </div>
+                    <div style={{ background: 'rgba(99, 102, 241, 0.08)', padding: '12px', borderRadius: '8px', margin: '12px 0', fontSize: '12px' }}>
+                      <div><strong>Customer:</strong> {viewTicketModal.name}</div>
+                      <div><strong>Issue Type:</strong> {viewTicketModal.issue}</div>
+                      <div><strong>Heat Rating:</strong> <span style={{ color: viewTicketModal.heatColor }}>{viewTicketModal.heat}</span></div>
+                    </div>
+
+                    <div style={{ fontSize: '12.5px', color: 'var(--text-main)', background: 'var(--card-bg-solid)', padding: '14px', borderRadius: '8px', border: '1px solid var(--card-border)', whiteSpace: 'pre-line', maxHeight: '180px', overflowY: 'auto' }}>
+                      {viewTicketModal.transcript}
+                    </div>
+
+                    {/* Audio Player Simulation */}
+                    <div style={{ marginTop: '14px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>▶️ Voice Recording (0:42)</span>
+                      </span>
+                      <span style={{ color: 'var(--secondary)', fontWeight: '700' }}>Waveform Active</span>
+                    </div>
+
+                    <button className="btn btn-secondary" style={{ width: '100%', marginTop: '16px' }} onClick={() => setViewTicketModal(null)}>
+                      Close Transcript
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ── LIVE CHAT TAKEOVER MODAL ── */}
+              {takeoverModal && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                  <div className="card" style={{ maxWidth: '550px', width: '100%', border: '1px solid var(--secondary)' }}>
+                    <div className="card-header">
+                      <span className="card-title">💬 Take Over Live Session: {takeoverModal.id}</span>
+                      <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '18px' }} onClick={() => setTakeoverModal(null)}>×</button>
+                    </div>
+
+                    <div style={{ fontSize: '12.5px', color: 'var(--text-main)', marginBottom: '14px' }}>
+                      You are taking over live communication with <strong>{takeoverModal.name}</strong>. Aria will pause automated responses for this session.
+                    </div>
+
+                    <textarea 
+                      className="form-control" 
+                      rows="3" 
+                      value={takeoverMessage} 
+                      onChange={(e) => setTakeoverMessage(e.target.value)}
+                      placeholder="Type live message to send directly to shopper..."
+                    />
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                      <button 
+                        className="btn btn-primary" 
+                        style={{ flex: 1 }}
+                        onClick={() => {
+                          addLog('success', `Human agent took over ticket ${takeoverModal.id}. Message sent to shopper.`);
+                          alert(`Message sent to ${takeoverModal.name}! Takeover active.`);
+                          setTakeoverModal(null);
+                          setTakeoverMessage('');
+                        }}
+                      >
+                        Send Agent Reply
+                      </button>
+                      <button className="btn btn-secondary" onClick={() => setTakeoverModal(null)}>Cancel</button>
                     </div>
                   </div>
                 </div>
-
-                {/* Ranked Pages Table */}
-                <div className="card">
-                  <div className="card-header">
-                    <span className="card-title">Pages breakdown</span>
-                    <button className="pill-filter" style={{ padding: '2px 8px', fontSize: '10.5px' }}>Last month ∨</button>
-                  </div>
-                  <div className="table-responsive">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Page Path</th>
-                          <th>Trend</th>
-                          <th style={{ textAlign: 'right' }}>Total Views</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          { path: 'Homepage', views: '59 085', pct: 90 },
-                          { path: 'Catalog', views: '58 325', pct: 85 },
-                          { path: 'Products', views: '51 187', pct: 75 },
-                          { path: 'Gallery', views: '49 258', pct: 68 },
-                          { path: 'Video', views: '38 567', pct: 50 },
-                        ].map((p, idx) => (
-                          <tr key={idx}>
-                            <td style={{ fontWeight: '600' }}>{p.path}</td>
-                            <td>
-                              <div className="mini-progress-bg">
-                                <div className="mini-progress-fill" style={{ width: `${p.pct}%` }}></div>
-                              </div>
-                            </td>
-                            <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--primary)' }}>{p.views}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -2217,30 +2343,32 @@ export default function App() {
         </main>
       </div>
 
-      {/* Floating Chat Icon Preview */}
+      {/* Floating Action Button */}
       <div 
         style={{
           position: 'fixed',
-          bottom: '24px',
-          right: widgetPosition === 'bottom-right' ? '24px' : 'auto',
-          left: widgetPosition === 'bottom-left' ? '24px' : 'auto',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          background: widgetColor,
+          bottom: '32px',
+          right: widgetPosition === 'bottom-right' ? '32px' : 'auto',
+          left: widgetPosition === 'bottom-left' ? '32px' : 'auto',
+          padding: '10px 16px',
+          borderRadius: '9999px',
+          background: 'var(--primary)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
+          gap: '8px',
+          fontSize: '12px',
+          fontWeight: '500',
           cursor: 'pointer',
-          boxShadow: `0 0 20px ${widgetColor}88`,
-          zIndex: 1000
+          boxShadow: '0 10px 15px -3px rgba(139, 92, 246, 0.3), 0 4px 6px -2px rgba(139, 92, 246, 0.15)',
+          zIndex: 1000,
+          transition: 'all 0.2s ease'
         }}
         onClick={() => setActiveTab('widget')}
-        title="Widget preview button"
+        title="Test Aria Sandbox"
       >
-        💬
+        <span style={{ fontSize: '14px' }}>⚡</span>
+        <span>Test Sandbox</span>
       </div>
     </div>
   );
