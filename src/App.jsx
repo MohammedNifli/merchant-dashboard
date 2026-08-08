@@ -69,10 +69,12 @@ function MiniCreditDonutChart() {
 function AriaSalesTrendChart({ trend }) {
   const raw = Array.isArray(trend) ? trend.filter(Boolean) : [];
   const points = raw.map((p) => {
-    let label = p.month || p.period || p.label || p.date || p.bucket || '';
+    let label = p.month || p.period || p.label || p.date || p.year || p.bucket || '';
     if (/^\d{4}-\d{2}$/.test(label)) {
       const [y, m] = label.split('-').map(Number);
       label = new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'short' }) + ` '${String(y).slice(2)}`;
+    } else if (/^\d{4}$/.test(label)) {
+      label = label;
     }
     return {
       label,
@@ -511,6 +513,7 @@ export default function App() {
   // Dashboard Metrics State (from GET /merchant/dashboard/metrics)
   const [dashMetrics, setDashMetrics] = useState(null);
   const [isLoadingDashboard, setIsLoadingDashboard] = useState(false);
+  const [trendRange, setTrendRange] = useState('monthly');
 
   // Billing State
   const [billingPlans, setBillingPlans] = useState([]);
@@ -614,14 +617,15 @@ export default function App() {
   };
 
   // API Call: Dashboard Metrics (GET /merchant/dashboard/metrics)
-  const fetchDashboardMetrics = async (authToken = token) => {
+  const fetchDashboardMetrics = async (authToken = token, period = trendRange) => {
     setIsLoadingDashboard(true);
     try {
-      const response = await authFetch('/merchant/dashboard/metrics', { headers: { 'Authorization': `Bearer ${authToken}` } });
+      const response = await authFetch(`/merchant/dashboard/metrics?period=${encodeURIComponent(period)}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
       if (response.ok) {
         const json = await response.json();
         setDashMetrics(json.data || json);
-        addLog('success', 'Dashboard metrics loaded.');
+        setTrendRange(period);
+        addLog('success', `Dashboard metrics loaded (${period}).`);
       } else {
         addLog('error', `Dashboard metrics failed (HTTP ${response.status}). Using fallback data.`);
       }
@@ -646,7 +650,18 @@ export default function App() {
   const dmEng = dmKpis.engagement || {};
   const dmPlan = dmKpis.plan_usage || {};
   const dmPulse = (dm.performance_hub || {}).live_pulse || {};
-  const dmTrend = (dm.performance_hub || {}).revenue_dialogue_trend || [];
+  const dmPh = dm.performance_hub || {};
+  const dmTrend = Array.isArray(dmPh.revenue_dialogue_trend)
+    ? dmPh.revenue_dialogue_trend
+    : Array.isArray(dmPh.revenue_trend)
+      ? dmPh.revenue_trend
+      : Array.isArray(dmPh.dialogue_trend)
+        ? dmPh.dialogue_trend
+        : Array.isArray(dmPh.trend)
+          ? dmPh.trend
+          : Array.isArray(dm[trendRange])
+            ? dm[trendRange]
+            : [];
   const dmProducts = (dm.operational_desk || {}).top_converted_products || [];
   const dmEsc = (dm.operational_desk || {}).support_escalations || {};
   const dmTickets = dmEsc.recent_tickets || [];
@@ -1408,11 +1423,25 @@ export default function App() {
               <div className="dashboard-grid-12">
                 {/* Left Card: Revenue & Dialogue Trend (col-span-8) */}
                 <div className="card col-span-8">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }}>
                     <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-main)' }}>Revenue & Dialogue Volume</span>
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6' }}></span> Sales ($)</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06b6d4' }}></span> Turns (#)</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {['monthly', 'yearly'].map(r => (
+                          <button
+                            key={r}
+                            className={`btn ${trendRange === r ? 'btn-primary' : 'btn-secondary'}`}
+                            onClick={() => { setTrendRange(r); fetchDashboardMetrics(token, r); }}
+                            style={{ padding: '4px 12px', fontSize: '11px', textTransform: 'capitalize' }}
+                          >
+                            {r}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6' }}></span> Sales ($)</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06b6d4' }}></span> Turns (#)</span>
+                      </div>
                     </div>
                   </div>
                   <AriaSalesTrendChart trend={dmTrend} />
