@@ -612,9 +612,9 @@ export default function App() {
   const voiceSplit = dmEng.voice_split_percentage ?? dmEng.voice_split;
   const textSplit = dmEng.text_split_percentage ?? dmEng.text_split;
   const avgTurnSeconds = dmEng.avg_voice_turn_seconds;
-  const creditsUsed = dmPlan.credits_used;
-  const creditsTotal = dmPlan.credits_total ?? dmPlan.max_conversations;
-  const planName = dmPlan.plan_tier ?? dmPlan.plan_name;
+  const creditsUsed = dmPlan.credits_used ?? dmPlan.used_credits ?? dmPlan.credits_consumed ?? dmPlan.used;
+  const creditsTotal = dmPlan.credits_total ?? dmPlan.total_credits ?? dmPlan.max_conversations ?? dmPlan.limit;
+  const planName = dmPlan.plan_tier ?? dmPlan.plan_name ?? dmPlan.tier;
 
   const toMoney = (v, fb) => {
     if (v == null || isNaN(Number(v))) return fb;
@@ -636,7 +636,6 @@ export default function App() {
   const shownTickets = dmTickets.slice(ticketPage * PAGE_SIZE, (ticketPage + 1) * PAGE_SIZE);
 
   const PaginationControls = ({ page, pageCount, onPageChange }) => {
-    if (pageCount <= 1) return null;
     return (
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', marginTop: '16px', fontSize: '12px' }}>
         <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }} disabled={page === 0} onClick={() => onPageChange(page - 1)}>‹ Prev</button>
@@ -1424,9 +1423,13 @@ export default function App() {
                       {dmProducts.length ? (
                         shownProducts.map((p, idx, arr) => {
                         const name = p.product_name || p.title || p.product_title || p.name || p.product || '—';
-                        const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
+                        const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.promo_qty ?? p.count ?? 0;
                         const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
-                        const badge = p.promo_badge || p.offer_title || p.offer_name || p.badge || p.promo || p.offer || '';
+                        const promoRaw = p.promo_badge ?? p.offer_title ?? p.offer_name ?? p.badge ?? p.promo ?? p.offer ?? p.promo_title;
+                        let badge = '';
+                        if (promoRaw != null) {
+                          badge = (typeof promoRaw === 'object') ? (promoRaw.title || promoRaw.name || promoRaw.label || promoRaw.badge || '') : String(promoRaw);
+                        }
                         return (
                         <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
                           <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>{name}</td>
