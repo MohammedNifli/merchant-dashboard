@@ -1263,14 +1263,14 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Aria Revenue</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {tenant.currency_symbol}{dmRev.total_amount != null ? toMoney(dmRev.total_amount) : toMoney(agentSold?.agent_revenue, '14,280.00')}
+                      {dmRev.total_amount != null ? `${tenant.currency_symbol}${toMoney(dmRev.total_amount)}` : (isLoadingDashboard ? '—' : `${tenant.currency_symbol}0.00`)}
                     </span>
                     <span style={{ fontSize: '12px', fontWeight: '500', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
-                      ↑ {dmRev.lift_percentage != null ? toPct(dmRev.lift_percentage, '+50.3%') : '+50.3%'}
+                      {dmRev.lift_percentage != null ? `↑ ${toPct(dmRev.lift_percentage)}` : '—'}
                     </span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {dmRev.share_of_sales_percentage != null ? toPct(dmRev.share_of_sales_percentage, '50.3%') : '50.3%'} of total sales
+                    {dmRev.share_of_sales_percentage != null ? `${toPct(dmRev.share_of_sales_percentage)} of total sales` : '—'}
                   </div>
                 </div>
 
@@ -1279,14 +1279,14 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Aria Orders</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {dmConv.order_count != null ? Number(dmConv.order_count).toLocaleString() : (agentSold?.agent_order_count || '184')}
+                      {dmConv.order_count != null ? Number(dmConv.order_count).toLocaleString() : (isLoadingDashboard ? '—' : '0')}
                     </span>
                     <span style={{ fontSize: '12px', fontWeight: '500', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '12px' }}>
-                      {dmConv.lift_percentage != null ? toPct(dmConv.lift_percentage, '+18.4%') : '+18.4%'} Lift
+                      {dmConv.lift_percentage != null ? `${toPct(dmConv.lift_percentage)} Lift` : '—'}
                     </span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {tenant.currency_symbol}{dmConv.avg_order_value != null ? toMoney(dmConv.avg_order_value) : '77.60'} Avg Order Value
+                    {dmConv.avg_order_value != null ? `${tenant.currency_symbol}${toMoney(dmConv.avg_order_value)} Avg Order Value` : '—'}
                   </div>
                 </div>
 
@@ -1295,11 +1295,11 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Voice vs Text</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {dmEng.voice_split != null ? `${toPct(dmEng.voice_split, '0%')} / ${toPct(dmEng.text_split, '0%')}` : '68% / 32%'}
+                      {dmEng.voice_split != null ? `${toPct(dmEng.voice_split)} / ${toPct(dmEng.text_split)}` : (isLoadingDashboard ? '—' : '—')}
                     </span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {dmEng.avg_voice_turn_seconds != null ? `Avg Voice Turn: ${Math.round(Number(dmEng.avg_voice_turn_seconds))}s` : 'Avg Voice Turn: 42s'}
+                    {dmEng.avg_voice_turn_seconds != null ? `Avg Voice Turn: ${Math.round(Number(dmEng.avg_voice_turn_seconds))}s` : '—'}
                   </div>
                 </div>
 
@@ -1308,14 +1308,16 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Plan Usage</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {dmPlan.credits_used != null ? Number(dmPlan.credits_used).toLocaleString() : '1,440'} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {dmPlan.max_conversations != null ? Number(dmPlan.max_conversations).toLocaleString() : '2,000'}</span>
+                      {dmPlan.credits_used != null ? (
+                        <>{Number(dmPlan.credits_used).toLocaleString()} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {dmPlan.max_conversations != null ? Number(dmPlan.max_conversations).toLocaleString() : '—'}</span></>
+                      ) : (isLoadingDashboard ? '—' : '0 / —')}
                     </span>
                   </div>
                   <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${planPct || 72}%`, height: '100%', background: 'var(--primary)' }}></div>
+                    <div style={{ width: `${dmPlan.max_conversations ? planPct : 0}%`, height: '100%', background: 'var(--primary)' }}></div>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {planPct || 72}% Used • {dmPlan.plan_name || 'Growth Plan'}
+                    {dmPlan.credits_used != null && dmPlan.max_conversations != null ? `${planPct}% Used` : '—'}{dmPlan.plan_name ? ` • ${dmPlan.plan_name}` : ''}
                   </div>
                 </div>
               </div>
@@ -1384,14 +1386,8 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(dmProducts.length
-                        ? dmProducts
-                        : [
-                          { name: 'Leather Jacket', qty: 42, rev: 5460.00, badge: '15% Off' },
-                          { name: 'Running Shoes', qty: 28, rev: 3360.00, badge: 'Dead-Stock' },
-                          { name: 'Denim Jeans', qty: 19, rev: 1710.00, badge: 'Bundle' },
-                          { name: 'Wireless Earbuds', qty: 15, rev: 1350.00, badge: 'Flash Sale' },
-                        ]).map((p, idx, arr) => {
+                      {dmProducts.length ? (
+                        dmProducts.map((p, idx, arr) => {
                         const name = p.title || p.product_title || p.name || p.product_name || p.product || '—';
                         const qty = p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
                         const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
@@ -1410,7 +1406,14 @@ export default function App() {
                           </td>
                         </tr>
                         );
-                      })}
+                      })
+                      ) : (
+                        <tr>
+                          <td colSpan="4" style={{ padding: '24px 0', textAlign: 'center', fontSize: '12px', color: 'var(--text-light)' }}>
+                            No product data available yet.
+                          </td>
+                        </tr>
+                      )}
                       </tbody>
                     </table>
                   </div>
@@ -1437,14 +1440,8 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(dmTickets.length
-                        ? dmTickets
-                        : [
-                          { id: 'TK-1001', name: 'David Miller', issue: 'Delivery Issue', heat: 'Hot', heatColor: '#ef4444', transcript: '...' },
-                          { id: 'TK-1002', name: 'Elena Rostova', issue: 'Restock Query', heat: 'Warm', heatColor: '#f59e0b', transcript: '...' },
-                          { id: 'TK-1003', name: 'Marcus Chen', issue: 'Refund Request', heat: 'Warm', heatColor: '#f59e0b', transcript: '...' },
-                          { id: 'TK-1004', name: 'Sarah Jenkins', issue: 'Discount Code', heat: 'Cold', heatColor: '#3b82f6', transcript: '...' },
-                        ]).map((t, idx, arr) => {
+                      {dmTickets.length ? (
+                        dmTickets.map((t, idx, arr) => {
                         const ticket = {
                           id: t.ticket_number || t.id || t.ticket_id || t.tk_number || '—',
                           name: t.customer_name || t.customer || t.name || '—',
@@ -1474,7 +1471,14 @@ export default function App() {
                           </td>
                         </tr>
                         );
-                      })}
+                      })
+                      ) : (
+                        <tr>
+                          <td colSpan="4" style={{ padding: '24px 0', textAlign: 'center', fontSize: '12px', color: 'var(--text-light)' }}>
+                            No recent tickets.
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                   </div>
