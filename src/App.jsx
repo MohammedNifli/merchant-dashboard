@@ -566,6 +566,7 @@ export default function App() {
       const response = await authFetch('/merchant/dashboard/metrics', { headers: { 'Authorization': `Bearer ${authToken}` } });
       if (response.ok) {
         const json = await response.json();
+        console.log('GET /merchant/dashboard/metrics response:', json);
         setDashMetrics(json.data || json);
         addLog('success', 'Dashboard metrics loaded.');
       } else {
