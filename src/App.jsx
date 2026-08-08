@@ -1388,10 +1388,17 @@ export default function App() {
                 {/* KPI 4: PLAN USAGE & CREDITS */}
                 <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Plan Usage</div>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <DonutUsageChart used={creditsUsed} total={creditsTotal} label={planName || 'Credits'} />
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
+                      {creditsUsed != null ? (
+                        <>{Number(creditsUsed).toLocaleString()} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {creditsTotal != null ? Number(creditsTotal).toLocaleString() : '—'}</span></>
+                      ) : (isLoadingDashboard ? '—' : '0 / —')}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                  <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: `${creditsTotal ? planPct : 0}%`, height: '100%', background: 'var(--primary)' }}></div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                     {creditsUsed != null && creditsTotal != null ? `${planPct}% Used` : '—'}{planName ? ` • ${planName}` : ''}
                   </div>
                 </div>
@@ -1456,7 +1463,8 @@ export default function App() {
                       <tr>
                         <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product</th>
                         <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>Promo</th>
-                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Qty</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Qty Sold</th>
+                        <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Promo Qty</th>
                         <th style={{ paddingBottom: '12px', fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Revenue</th>
                       </tr>
                     </thead>
@@ -1464,10 +1472,10 @@ export default function App() {
                       {dmProducts.length ? (
                         shownProducts.map((p, idx, arr) => {
                         const name = p.product_name || p.title || p.product_title || p.name || p.product || '—';
-                        const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.promo_qty ?? p.count ?? 0;
+                        const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
+                        const promoQtyVal = p.promo_qty ?? p.promo_quantity ?? p.promo_sold ?? p.offer_qty ?? null;
                         const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
                         const promoRaw = p.promo_badge ?? p.offer_title ?? p.offer_name ?? p.badge ?? p.promo ?? p.offer ?? p.promo_title;
-                        const promoQty = p.promo_qty ?? p.promo_quantity ?? (promoRaw && typeof promoRaw === 'object' ? (promoRaw.qty ?? promoRaw.quantity) : null);
                         let badge = '';
                         if (promoRaw != null) {
                           badge = (typeof promoRaw === 'object') ? (promoRaw.title || promoRaw.name || promoRaw.label || promoRaw.badge || '') : String(promoRaw);
@@ -1476,13 +1484,12 @@ export default function App() {
                         <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
                           <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>{name}</td>
                           <td style={{ padding: '16px 0', textAlign: 'center' }}>
-                            {badge || promoQty != null ? (
-                              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                                {badge}{promoQty != null && badge ? ` · ` : ''}{promoQty != null ? `×${Number(promoQty).toLocaleString()}` : ''}
-                              </span>
+                            {badge ? (
+                              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{badge}</span>
                             ) : <span style={{ fontSize: '11px', color: 'var(--text-light)' }}>—</span>}
                           </td>
-                          <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>{Number(qty).toLocaleString()}</td>
+                          <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', color: 'var(--text-main)', fontWeight: '600' }}>{Number(qty).toLocaleString()}</td>
+                          <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>{promoQtyVal != null ? Number(promoQtyVal).toLocaleString() : '—'}</td>
                           <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>
                             {tenant.currency_symbol}{toMoney(rev, '0.00')}
                           </td>
@@ -1491,7 +1498,7 @@ export default function App() {
                       })
                       ) : (
                         <tr>
-                          <td colSpan="4" style={{ padding: '24px 0', textAlign: 'center', fontSize: '12px', color: 'var(--text-light)' }}>
+                          <td colSpan="5" style={{ padding: '24px 0', textAlign: 'center', fontSize: '12px', color: 'var(--text-light)' }}>
                             No product data available yet.
                           </td>
                         </tr>
