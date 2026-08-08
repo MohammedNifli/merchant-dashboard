@@ -434,20 +434,10 @@ export default function App() {
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isLoadingChat, setIsLoadingChat] = useState(false);
 
-  // Widget Visual Customizer state
-  const [widgetColor, setWidgetColor] = useState('#8b5cf6');
-  const [widgetPosition, setWidgetPosition] = useState('bottom-right');
-  const [enableVoice, setEnableVoice] = useState(true);
-  const [enableText, setEnableText] = useState(true);
-  const [autoOpenMobile, setAutoOpenMobile] = useState(false);
-  const [excludedPages, setExcludedPages] = useState('/cart\n/checkout');
-
   // Logs terminal state
   const [logs, setLogs] = useState([
     { time: new Date().toLocaleTimeString(), type: 'info', text: 'Speako Merchant Dashboard Initialized (Obsidian Theme)' }
   ]);
-  const [isTestingConnection, setIsTestingConnection] = useState(false);
-  const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
 
   // AI Voice Simulator state
@@ -656,89 +646,6 @@ export default function App() {
       addLog('error', `Error saving settings: ${err.message}`);
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  // API Call: Rotate Credentials
-  const handleRotateCredentials = async () => {
-    if (!window.confirm('Are you sure you want to regenerate key tokens? Old credentials will be invalidated.')) return;
-    addLog('info', 'Rotating API tokens...');
-    if (isSandboxMode) {
-      const newKey = `cust_${Math.random().toString(36).substring(2, 12)}_${Date.now().toString(36)}`;
-      setEditedTenant(prev => ({ ...prev, custom_api_key: newKey }));
-      addLog('success', `Generated new Custom API Lookup Key: ${newKey}`);
-      return;
-    }
-    try {
-      const response = await authFetch('/tenants/me/rotate-credentials', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setEditedTenant(prev => ({ ...prev, ...data }));
-        addLog('success', 'Store credentials rotated successfully.');
-      } else {
-        addLog('error', 'Credential rotation rejected by server.');
-      }
-    } catch (err) {
-      addLog('error', `Rotate failed: ${err.message}`);
-    }
-  };
-
-  // API Call: Sync Products
-  const handleSyncProducts = async () => {
-    setIsSyncingProducts(true);
-    addLog('info', 'Triggering storefront product catalog synchronization...');
-    try {
-      if (isSandboxMode) {
-        setTimeout(() => {
-          setIsSyncingProducts(false);
-          addLog('success', 'Simulated sync: 148 products & 312 variants refreshed.');
-        }, 1200);
-        return;
-      }
-      const response = await authFetch('/merchant/sync-products', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        addLog('success', 'Product re-sync initiated successfully.');
-      } else {
-        addLog('error', 'Re-sync API request rejected by server.');
-      }
-    } catch (err) {
-      addLog('error', `Sync failed: ${err.message}`);
-    } finally {
-      setIsSyncingProducts(false);
-    }
-  };
-
-  // API Call: Test Connection
-  const handleTestConnection = async () => {
-    setIsTestingConnection(true);
-    addLog('info', 'Pinging storefront connection endpoint...');
-    try {
-      if (isSandboxMode) {
-        setTimeout(() => {
-          setIsTestingConnection(false);
-          addLog('success', `Sandbox Test: Connected to ${tenant.platform} (${tenant.shopify_domain || 'mock.store'}) with 18ms latency.`);
-        }, 800);
-        return;
-      }
-      const response = await authFetch('/merchant/test-connection', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        addLog('success', `Connection status: ${data.message || 'Active'}`);
-      } else {
-        addLog('error', 'Connection test failed.');
-      }
-    } catch (err) {
-      addLog('error', `Connection error: ${err.message}`);
-    } finally {
-      setIsTestingConnection(false);
     }
   };
 
@@ -1267,32 +1174,11 @@ export default function App() {
                 {!sidebarCollapsed && <span className="sidebar-item-label">Persona & Voice Config</span>}
               </div>
             </div>
-
-            <div className={`sidebar-item ${activeTab === 'widget' ? 'active' : ''}`} onClick={() => setActiveTab('widget')}>
-              <div className="sidebar-item-left">
-                <span className="sidebar-item-icon">🎨</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Widget Customization</span>}
-              </div>
-            </div>
           </div>
 
           <div className="sidebar-nav-section">
             {!sidebarCollapsed && <div className="sidebar-nav-title">Store & Setup</div>}
             
-            <div className={`sidebar-item ${activeTab === 'integrations' ? 'active' : ''}`} onClick={() => setActiveTab('integrations')}>
-              <div className="sidebar-item-left">
-                <span className="sidebar-item-icon">🔗</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Store Integration</span>}
-              </div>
-            </div>
-
-            <div className={`sidebar-item ${activeTab === 'diagnostics' ? 'active' : ''}`} onClick={() => setActiveTab('diagnostics')}>
-              <div className="sidebar-item-left">
-                <span className="sidebar-item-icon">⚡</span>
-                {!sidebarCollapsed && <span className="sidebar-item-label">Catalog & Sync Status</span>}
-              </div>
-            </div>
-
             <div className={`sidebar-item ${activeTab === 'billing' ? 'active' : ''}`} onClick={() => { setActiveTab('billing'); fetchBilling(); }}>
               <div className="sidebar-item-left">
                 <span className="sidebar-item-icon">💳</span>
@@ -2040,79 +1926,6 @@ export default function App() {
             </div>
           )}
 
-          {/* ── TAB: WIDGET DESIGN ── */}
-          {activeTab === 'widget' && (
-            <div>
-              <div className="page-header">
-                <div>
-                  <h1 className="page-title">Widget Visual Customizer</h1>
-                  <p className="page-subtitle">Customize chat bubble accent colors, screen placement, and excluded paths.</p>
-                </div>
-              </div>
-
-              <div className="grid-cols-2">
-                <div className="card">
-                  <h2 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '16px' }}>Theme Controls</h2>
-                  
-                  <div className="form-group">
-                    <label>Primary Brand Accent Color</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <input type="color" value={widgetColor} onChange={(e) => setWidgetColor(e.target.value)} style={{ width: '40px', height: '40px', border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
-                      <input type="text" className="form-control" value={widgetColor} onChange={(e) => setWidgetColor(e.target.value)} style={{ width: '130px' }} />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Widget Screen Position</label>
-                    <select className="form-control" value={widgetPosition} onChange={(e) => setWidgetPosition(e.target.value)}>
-                      <option value="bottom-right">Bottom Right (Default)</option>
-                      <option value="bottom-left">Bottom Left</option>
-                    </select>
-                  </div>
-
-                  <div className="switch-group">
-                    <div className="switch-info">
-                      <span className="switch-title">Voice Conversation Mode</span>
-                      <span className="switch-desc">Allow customers to speak using microphone audio.</span>
-                    </div>
-                    <label className="switch">
-                      <input type="checkbox" checked={enableVoice} onChange={(e) => setEnableVoice(e.target.checked)} />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-
-                  <div className="switch-group">
-                    <div className="switch-info">
-                      <span className="switch-title">Text Chat Mode</span>
-                      <span className="switch-desc">Enable keyboard text input fallback in widget window.</span>
-                    </div>
-                    <label className="switch">
-                      <input type="checkbox" checked={enableText} onChange={(e) => setEnableText(e.target.checked)} />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Excluded paths & preview */}
-                <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <h2 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '16px' }}>Live Preview</h2>
-                  
-                  <div style={{ flex: 1, border: '1px dashed var(--card-border)', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(7, 6, 17, 0.4)' }}>
-                    <span style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>Chat Bubble Screen Widget:</span>
-                    
-                    <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: widgetColor, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', boxShadow: `0 0 25px ${widgetColor}66` }}>
-                      💬
-                    </div>
-
-                    <span style={{ fontSize: '12px', color: 'var(--text-light)', marginTop: '12px' }}>
-                      Placement: {widgetPosition}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* ── TAB: GENERAL SETTINGS ── */}
           {activeTab === 'settings' && (
             <div>
@@ -2163,104 +1976,6 @@ export default function App() {
                   </button>
                 </div>
               </form>
-            </div>
-          )}
-
-          {/* ── TAB: INTEGRATIONS ── */}
-          {activeTab === 'integrations' && (
-            <div>
-              <div className="page-header">
-                <div>
-                  <h1 className="page-title">Storefront Platform Credentials</h1>
-                  <p className="page-subtitle">Link your Shopify or WooCommerce store API tokens to sync catalog data.</p>
-                </div>
-              </div>
-
-              <div className="card" style={{ maxWidth: '780px' }}>
-                <form onSubmit={handleSaveSettings}>
-                  <div className="form-group">
-                    <label>Platform System</label>
-                    <select className="form-control" value={editedTenant.platform || 'shopify'} onChange={(e) => setEditedTenant({ ...editedTenant, platform: e.target.value })}>
-                      <option value="shopify">Shopify Integration</option>
-                      <option value="woocommerce">WooCommerce REST API</option>
-                      <option value="custom_api">Custom Inbound REST API</option>
-                    </select>
-                  </div>
-
-                  {editedTenant.platform === 'shopify' && (
-                    <>
-                      <div className="form-group">
-                        <label>Shopify Store Domain</label>
-                        <input type="text" className="form-control" value={editedTenant.shopify_domain || ''} onChange={(e) => setEditedTenant({ ...editedTenant, shopify_domain: e.target.value })} />
-                      </div>
-                      <div className="form-group">
-                        <label>Admin Access Token</label>
-                        <input type="password" className="form-control" value={editedTenant.shopify_access_token || ''} onChange={(e) => setEditedTenant({ ...editedTenant, shopify_access_token: e.target.value })} />
-                      </div>
-                    </>
-                  )}
-
-                  {editedTenant.platform === 'woocommerce' && (
-                    <>
-                      <div className="form-group">
-                        <label>WooCommerce Base Store URL</label>
-                        <input type="text" className="form-control" value={editedTenant.woocommerce_store_url || ''} onChange={(e) => setEditedTenant({ ...editedTenant, woocommerce_store_url: e.target.value })} />
-                      </div>
-                    </>
-                  )}
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-                    <button type="button" className="btn btn-secondary" onClick={handleRotateCredentials}>
-                      🔄 Rotate Keys
-                    </button>
-                    <button type="submit" className="btn btn-primary" disabled={isSaving}>
-                      {isSaving ? 'Encrypting...' : 'Save Credentials'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* ── TAB: DIAGNOSTICS & SYSTEM ── */}
-          {activeTab === 'diagnostics' && (
-            <div>
-              <div className="page-header">
-                <div>
-                  <h1 className="page-title">Diagnostics & Terminal Logs</h1>
-                  <p className="page-subtitle">Trigger product catalog syncs, test DNS connections, and read real-time activity logs.</p>
-                </div>
-              </div>
-
-              <div className="grid-cols-2">
-                <div className="card">
-                  <h2 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '16px' }}>System Actions</h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    <button className="btn btn-primary" onClick={handleSyncProducts} disabled={isSyncingProducts}>
-                      {isSyncingProducts ? 'Syncing Catalog...' : 'Trigger Product Catalog Re-sync'}
-                    </button>
-                    <button className="btn btn-secondary" onClick={handleTestConnection} disabled={isTestingConnection}>
-                      {isTestingConnection ? 'Testing...' : 'Test Backend Connection Ping'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div className="card-header">
-                    <span className="card-title">Live Log Console</span>
-                    <button style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '12px' }} onClick={() => setLogs([])}>
-                      Clear Logs
-                    </button>
-                  </div>
-                  <div className="console-log" ref={logTerminalRef}>
-                    {logs.map((l, index) => (
-                      <div key={index} className={`log-line ${l.type}`}>
-                        <span className="log-line time">[{l.time}]</span> {l.type.toUpperCase()}: {l.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
@@ -2341,34 +2056,6 @@ export default function App() {
             </div>
           )}
         </main>
-      </div>
-
-      {/* Floating Action Button */}
-      <div 
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: widgetPosition === 'bottom-right' ? '32px' : 'auto',
-          left: widgetPosition === 'bottom-left' ? '32px' : 'auto',
-          padding: '10px 16px',
-          borderRadius: '9999px',
-          background: 'var(--primary)',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '12px',
-          fontWeight: '500',
-          cursor: 'pointer',
-          boxShadow: '0 10px 15px -3px rgba(139, 92, 246, 0.3), 0 4px 6px -2px rgba(139, 92, 246, 0.15)',
-          zIndex: 1000,
-          transition: 'all 0.2s ease'
-        }}
-        onClick={() => setActiveTab('widget')}
-        title="Test Aria Sandbox"
-      >
-        <span style={{ fontSize: '14px' }}>⚡</span>
-        <span>Test Sandbox</span>
       </div>
     </div>
   );
