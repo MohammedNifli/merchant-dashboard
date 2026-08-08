@@ -187,6 +187,46 @@ function AriaSalesTrendChart({ trend }) {
   );
 }
 
+// ── Circular Usage Donut Chart ──
+function DonutUsageChart({ used, total, label = 'Used' }) {
+  const size = 150;
+  const stroke = 14;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const pct = total ? Math.min(100, Math.max(0, (Number(used) / Number(total)) * 100)) : 0;
+  const offset = c - (pct / 100) * c;
+  const color = pct >= 90 ? '#ef4444' : pct >= 60 ? '#f59e0b' : '#8b5cf6';
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+      <div style={{ position: 'relative', width: `${size}px`, height: `${size}px` }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255, 255, 255, 0.08)" strokeWidth={stroke} />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={offset}
+            style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+          />
+        </svg>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-main)' }}>{pct.toFixed(0)}%</span>
+          <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{label}</span>
+        </div>
+      </div>
+      <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+        <strong style={{ color: 'var(--text-main)' }}>{used != null ? Number(used).toLocaleString() : '—'}</strong> of {total != null ? Number(total).toLocaleString() : '—'}
+      </div>
+    </div>
+  );
+}
+
 // ── Customer Intent Distribution (Top 5 & Expandable 9 Classes) ──
 function CustomerIntentDistributionChart() {
   const [showAllIntents, setShowAllIntents] = useState(false);
@@ -450,6 +490,8 @@ export default function App() {
   // Table pagination state
   const [productPage, setProductPage] = useState(0);
   const [ticketPage, setTicketPage] = useState(0);
+  const [orderPage, setOrderPage] = useState(0);
+  const [ticketsTabPage, setTicketsTabPage] = useState(0);
   const PAGE_SIZE = 5;
 
   // AI Voice Simulator state
@@ -939,8 +981,14 @@ export default function App() {
         authFetch('/billing/plans', { headers: { 'Authorization': `Bearer ${token}` } }),
         authFetch('/billing/subscription', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
-      if (plansRes.ok) setBillingPlans(await plansRes.json());
-      if (subRes.ok) setBillingSubscription(await subRes.json());
+      if (plansRes.ok) {
+        const pj = await plansRes.json();
+        setBillingPlans(Array.isArray(pj) ? pj : Array.isArray(pj?.data) ? pj.data : Array.isArray(pj?.plans) ? pj.plans : []);
+      }
+      if (subRes.ok) {
+        const sj = await subRes.json();
+        setBillingSubscription((sj && typeof sj === 'object' && !sj.data && !sj.subscription) ? sj : (sj?.data ?? sj?.subscription ?? sj));
+      }
     } catch (err) {
       addLog('error', `Billing fetch error: ${err.message}`);
     } finally {
@@ -1340,17 +1388,10 @@ export default function App() {
                 {/* KPI 4: PLAN USAGE & CREDITS */}
                 <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Plan Usage</div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                    <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {creditsUsed != null ? (
-                        <>{Number(creditsUsed).toLocaleString()} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {creditsTotal != null ? Number(creditsTotal).toLocaleString() : '—'}</span></>
-                      ) : (isLoadingDashboard ? '—' : '0 / —')}
-                    </span>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <DonutUsageChart used={creditsUsed} total={creditsTotal} label={planName || 'Credits'} />
                   </div>
-                  <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${creditsTotal ? planPct : 0}%`, height: '100%', background: 'var(--primary)' }}></div>
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center' }}>
                     {creditsUsed != null && creditsTotal != null ? `${planPct}% Used` : '—'}{planName ? ` • ${planName}` : ''}
                   </div>
                 </div>
@@ -1426,6 +1467,7 @@ export default function App() {
                         const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.promo_qty ?? p.count ?? 0;
                         const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
                         const promoRaw = p.promo_badge ?? p.offer_title ?? p.offer_name ?? p.badge ?? p.promo ?? p.offer ?? p.promo_title;
+                        const promoQty = p.promo_qty ?? p.promo_quantity ?? (promoRaw && typeof promoRaw === 'object' ? (promoRaw.qty ?? promoRaw.quantity) : null);
                         let badge = '';
                         if (promoRaw != null) {
                           badge = (typeof promoRaw === 'object') ? (promoRaw.title || promoRaw.name || promoRaw.label || promoRaw.badge || '') : String(promoRaw);
@@ -1434,8 +1476,10 @@ export default function App() {
                         <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
                           <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>{name}</td>
                           <td style={{ padding: '16px 0', textAlign: 'center' }}>
-                            {badge ? (
-                              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)' }}>{badge}</span>
+                            {badge || promoQty != null ? (
+                              <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                                {badge}{promoQty != null && badge ? ` · ` : ''}{promoQty != null ? `×${Number(promoQty).toLocaleString()}` : ''}
+                              </span>
                             ) : <span style={{ fontSize: '11px', color: 'var(--text-light)' }}>—</span>}
                           </td>
                           <td style={{ padding: '16px 0', textAlign: 'right', fontSize: '13px', color: 'var(--text-muted)' }}>{Number(qty).toLocaleString()}</td>
@@ -1683,7 +1727,7 @@ export default function App() {
                     <button
                       key={s}
                       className={`btn ${orderStatusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
-                      onClick={() => setOrderStatusFilter(s)}
+                      onClick={() => { setOrderStatusFilter(s); setOrderPage(0); }}
                       style={{ padding: '6px 14px', fontSize: '12px' }}
                     >
                       {s === '' ? 'All Orders' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -1696,6 +1740,7 @@ export default function App() {
                 ) : orders.length === 0 ? (
                   <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>No orders match this status.</div>
                 ) : (
+                  <>
                   <div className="table-responsive">
                     <table className="table">
                       <thead>
@@ -1712,6 +1757,7 @@ export default function App() {
                       <tbody>
                         {orders
                           .filter(o => !orderStatusFilter || o.status === orderStatusFilter)
+                          .slice(orderPage * PAGE_SIZE, (orderPage + 1) * PAGE_SIZE)
                           .map(o => (
                             <tr key={o.id}>
                               <td style={{ fontWeight: '700', color: 'var(--primary)' }}>{o.id.slice(0, 8)}</td>
@@ -1745,6 +1791,8 @@ export default function App() {
                       </tbody>
                     </table>
                   </div>
+                  <PaginationControls page={orderPage} pageCount={Math.max(1, Math.ceil(orders.filter(o => !orderStatusFilter || o.status === orderStatusFilter).length / PAGE_SIZE))} onPageChange={setOrderPage} />
+                  </>
                 )}
               </div>
             </div>
@@ -1767,7 +1815,7 @@ export default function App() {
                     <button
                       key={s}
                       className={`btn ${ticketStatusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
-                      onClick={() => { setTicketStatusFilter(s); setExpandedTicket(null); setTimeout(fetchTickets, 0); }}
+                      onClick={() => { setTicketStatusFilter(s); setExpandedTicket(null); setTicketsTabPage(0); setTimeout(fetchTickets, 0); }}
                       style={{ padding: '6px 14px', fontSize: '12px' }}
                     >
                       {s.replace('_', ' ').toUpperCase()}
@@ -1781,7 +1829,7 @@ export default function App() {
                   <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>No {ticketStatusFilter} tickets right now.</div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                    {tickets.map(t => (
+                    {tickets.slice(ticketsTabPage * PAGE_SIZE, (ticketsTabPage + 1) * PAGE_SIZE).map(t => (
                       <div key={t.id} style={{ border: '1px solid var(--card-border)', borderRadius: '12px', padding: '16px', background: 'rgba(139, 92, 246, 0.04)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1829,6 +1877,7 @@ export default function App() {
                         )}
                       </div>
                     ))}
+                    <PaginationControls page={ticketsTabPage} pageCount={Math.max(1, Math.ceil(tickets.length / PAGE_SIZE))} onPageChange={setTicketsTabPage} />
                   </div>
                 )}
               </div>
@@ -2038,31 +2087,35 @@ export default function App() {
                   <h2 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '16px' }}>Current Subscription</h2>
                   {isLoadingBilling ? (
                     <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Loading subscription...</div>
-                  ) : billingSubscription ? (
+                  ) : billingSubscription || dmPlan ? (
                     <>
-                      <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary)', textTransform: 'capitalize' }}>
-                        {billingSubscription.plan || tenant.plan} Tier
-                      </div>
-                      <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '10px 0 16px' }}>
-                        {billingSubscription.description ||
-                          `Includes 200 voice sessions/month, Shopify integration, and Aria AI assistant.`}
-                      </p>
-                      {billingSubscription.used != null && billingSubscription.limit != null && (
-                        <>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                            <span style={{ fontSize: '13.5px', color: 'var(--text-muted)' }}>Monthly Voice Sessions</span>
-                            <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-main)' }}>{billingSubscription.used} / {billingSubscription.limit} sessions</span>
-                          </div>
-                          <div className="mini-progress-bg" style={{ width: '100%', height: '10px', marginBottom: '16px' }}>
-                            <div className="mini-progress-fill" style={{ width: `${Math.min(100, (billingSubscription.used / billingSubscription.limit) * 100)}%` }}></div>
-                          </div>
-                        </>
-                      )}
-                      {billingSubscription.renews_at && (
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          Renews on {new Date(billingSubscription.renews_at).toLocaleDateString()}.
-                        </div>
-                      )}
+                      {(() => {
+                        const sub = billingSubscription || {};
+                        const subUsed = sub.used ?? sub.sessions_used ?? sub.credits_used ?? sub.usage ?? null;
+                        const subLimit = sub.limit ?? sub.session_limit ?? sub.credits_total ?? sub.quota ?? null;
+                        const used = subUsed != null ? Number(subUsed) : (creditsUsed != null ? Number(creditsUsed) : null);
+                        const limit = subLimit != null ? Number(subLimit) : (creditsTotal != null ? Number(creditsTotal) : null);
+                        const plan = sub.plan ?? sub.name ?? sub.plan_name ?? planName ?? tenant.plan ?? 'Growth';
+                        const desc = sub.description || `Includes ${limit != null ? `${limit.toLocaleString()} voice sessions` : 'monthly voice sessions'}/month, Shopify integration, and Aria AI assistant.`;
+                        return (
+                          <>
+                            <div style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary)', textTransform: 'capitalize' }}>
+                              {plan} Tier
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '10px 0 20px' }}>
+                              {desc}
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                              <DonutUsageChart used={used} total={limit} label={limit != null ? `${limit.toLocaleString()} Sessions` : 'Sessions'} />
+                            </div>
+                            {sub.renews_at && (
+                              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '12px' }}>
+                                Renews on {new Date(sub.renews_at).toLocaleDateString()}.
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </>
                   ) : (
                     <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
