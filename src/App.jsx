@@ -68,11 +68,18 @@ function MiniCreditDonutChart() {
 // ── Dual-Axis Aria Revenue ($) & Conversation Volume (#) Chart ──
 function AriaSalesTrendChart({ trend }) {
   const raw = Array.isArray(trend) ? trend.filter(Boolean) : [];
-  const points = raw.map((p) => ({
-    label: p.month || p.period || p.label || p.date || p.bucket || '',
-    revenue: Number(p.revenue ?? p.total_revenue ?? p.sales ?? p.total ?? 0),
-    turns: Number(p.message_count ?? p.messages ?? p.turns ?? p.conversation_count ?? p.count ?? 0)
-  }));
+  const points = raw.map((p) => {
+    let label = p.month || p.period || p.label || p.date || p.bucket || '';
+    if (/^\d{4}-\d{2}$/.test(label)) {
+      const [y, m] = label.split('-').map(Number);
+      label = new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'short' }) + ` '${String(y).slice(2)}`;
+    }
+    return {
+      label,
+      revenue: Number(p.sales ?? p.revenue ?? p.total_revenue ?? p.total ?? 0),
+      turns: Number(p.turns ?? p.message_count ?? p.messages ?? p.conversation_count ?? p.count ?? 0)
+    };
+  });
 
   const W = 540, H = 170;
   const hasData = points.length > 0;
@@ -440,6 +447,11 @@ export default function App() {
   ]);
   const [showAlert, setShowAlert] = useState(true);
 
+  // Table pagination state
+  const [productPage, setProductPage] = useState(0);
+  const [ticketPage, setTicketPage] = useState(0);
+  const PAGE_SIZE = 5;
+
   // AI Voice Simulator state
   const [simulatorQuery, setSimulatorQuery] = useState('');
   const [simulatorReply, setSimulatorReply] = useState('');
@@ -566,7 +578,6 @@ export default function App() {
       const response = await authFetch('/merchant/dashboard/metrics', { headers: { 'Authorization': `Bearer ${authToken}` } });
       if (response.ok) {
         const json = await response.json();
-        console.log('GET /merchant/dashboard/metrics response:', json);
         setDashMetrics(json.data || json);
         addLog('success', 'Dashboard metrics loaded.');
       } else {
@@ -598,6 +609,13 @@ export default function App() {
   const dmEsc = (dm.operational_desk || {}).support_escalations || {};
   const dmTickets = dmEsc.recent_tickets || [];
 
+  const voiceSplit = dmEng.voice_split_percentage ?? dmEng.voice_split;
+  const textSplit = dmEng.text_split_percentage ?? dmEng.text_split;
+  const avgTurnSeconds = dmEng.avg_voice_turn_seconds;
+  const creditsUsed = dmPlan.credits_used;
+  const creditsTotal = dmPlan.credits_total ?? dmPlan.max_conversations;
+  const planName = dmPlan.plan_tier ?? dmPlan.plan_name;
+
   const toMoney = (v, fb) => {
     if (v == null || isNaN(Number(v))) return fb;
     return Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 });
@@ -606,11 +624,27 @@ export default function App() {
     if (v == null || isNaN(Number(v))) return fb;
     return `${Number(v).toFixed(1)}%`;
   };
-  const planPct = dmPlan.max_conversations ? Math.min(100, Math.round((dmPlan.credits_used / dmPlan.max_conversations) * 100)) : 0;
-  const escAuto = toPct(dmEsc.auto_resolved_percentage ?? dmEsc.auto_resolved_pct, '82%');
-  const escEscalated = toPct(dmEsc.escalated_percentage ?? dmEsc.escalated_pct, '18%');
+  const planPct = creditsTotal ? Math.min(100, Math.round((creditsUsed / creditsTotal) * 100)) : 0;
+  const escAuto = toPct(dmEsc.auto_resolved_percentage ?? dmEsc.auto_resolved_pct, '0%');
+  const escEscalated = toPct(dmEsc.escalated_percentage ?? dmEsc.escalated_pct, '0%');
   const statusText = dmPulse.status_message || 'All systems operational • Redis & WS Connected';
   const isStatusOk = !dmPulse.status_message || !/down|offline|disconnect|error/i.test(dmPulse.status_message);
+
+  const productPageCount = Math.max(1, Math.ceil(dmProducts.length / PAGE_SIZE));
+  const ticketPageCount = Math.max(1, Math.ceil(dmTickets.length / PAGE_SIZE));
+  const shownProducts = dmProducts.slice(productPage * PAGE_SIZE, (productPage + 1) * PAGE_SIZE);
+  const shownTickets = dmTickets.slice(ticketPage * PAGE_SIZE, (ticketPage + 1) * PAGE_SIZE);
+
+  const PaginationControls = ({ page, pageCount, onPageChange }) => {
+    if (pageCount <= 1) return null;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', marginTop: '16px', fontSize: '12px' }}>
+        <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }} disabled={page === 0} onClick={() => onPageChange(page - 1)}>‹ Prev</button>
+        <span style={{ color: 'var(--text-muted)' }}>Page {page + 1} / {pageCount}</span>
+        <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '11px' }} disabled={page >= pageCount - 1} onClick={() => onPageChange(page + 1)}>Next ›</button>
+      </div>
+    );
+  };
 
   // API Call: Save Config
   const handleSaveSettings = async (e) => {
@@ -1296,11 +1330,11 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Voice vs Text</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {dmEng.voice_split != null ? `${toPct(dmEng.voice_split)} / ${toPct(dmEng.text_split)}` : (isLoadingDashboard ? '—' : '—')}
+                      {voiceSplit != null ? `${toPct(voiceSplit)} / ${toPct(textSplit)}` : (isLoadingDashboard ? '—' : '—')}
                     </span>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {dmEng.avg_voice_turn_seconds != null ? `Avg Voice Turn: ${Math.round(Number(dmEng.avg_voice_turn_seconds))}s` : '—'}
+                    {avgTurnSeconds != null ? `Avg Voice Turn: ${Math.round(Number(avgTurnSeconds))}s` : '—'}
                   </div>
                 </div>
 
@@ -1309,16 +1343,16 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)' }}>Plan Usage</div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                     <span style={{ fontSize: '30px', fontWeight: '600', letterSpacing: '-0.03em', color: 'var(--text-main)' }}>
-                      {dmPlan.credits_used != null ? (
-                        <>{Number(dmPlan.credits_used).toLocaleString()} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {dmPlan.max_conversations != null ? Number(dmPlan.max_conversations).toLocaleString() : '—'}</span></>
+                      {creditsUsed != null ? (
+                        <>{Number(creditsUsed).toLocaleString()} <span style={{ fontSize: '18px', color: 'var(--text-muted)', fontWeight: '500' }}>/ {creditsTotal != null ? Number(creditsTotal).toLocaleString() : '—'}</span></>
                       ) : (isLoadingDashboard ? '—' : '0 / —')}
                     </span>
                   </div>
                   <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${dmPlan.max_conversations ? planPct : 0}%`, height: '100%', background: 'var(--primary)' }}></div>
+                    <div style={{ width: `${creditsTotal ? planPct : 0}%`, height: '100%', background: 'var(--primary)' }}></div>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {dmPlan.credits_used != null && dmPlan.max_conversations != null ? `${planPct}% Used` : '—'}{dmPlan.plan_name ? ` • ${dmPlan.plan_name}` : ''}
+                    {creditsUsed != null && creditsTotal != null ? `${planPct}% Used` : '—'}{planName ? ` • ${planName}` : ''}
                   </div>
                 </div>
               </div>
@@ -1388,11 +1422,11 @@ export default function App() {
                     </thead>
                     <tbody>
                       {dmProducts.length ? (
-                        dmProducts.map((p, idx, arr) => {
-                        const name = p.title || p.product_title || p.name || p.product_name || p.product || '—';
-                        const qty = p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
+                        shownProducts.map((p, idx, arr) => {
+                        const name = p.product_name || p.title || p.product_title || p.name || p.product || '—';
+                        const qty = p.qty_sold ?? p.quantity ?? p.qty ?? p.units_sold ?? p.count ?? 0;
                         const rev = p.revenue ?? p.total_revenue ?? p.sales ?? 0;
-                        const badge = p.offer_title || p.offer_name || p.badge || p.promo || p.offer || '';
+                        const badge = p.promo_badge || p.offer_title || p.offer_name || p.badge || p.promo || p.offer || '';
                         return (
                         <tr key={idx} style={{ borderBottom: idx !== arr.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none' }}>
                           <td style={{ padding: '16px 0', fontSize: '13px', fontWeight: '500', color: 'var(--text-main)' }}>{name}</td>
@@ -1418,6 +1452,7 @@ export default function App() {
                       </tbody>
                     </table>
                   </div>
+                  <PaginationControls page={productPage} pageCount={productPageCount} onPageChange={setProductPage} />
                 </div>
 
                 {/* Right Card: Support Escalations & Tickets (col-span-6) */}
@@ -1442,13 +1477,13 @@ export default function App() {
                     </thead>
                     <tbody>
                       {dmTickets.length ? (
-                        dmTickets.map((t, idx, arr) => {
+                        shownTickets.map((t, idx, arr) => {
                         const ticket = {
-                          id: t.ticket_number || t.id || t.ticket_id || t.tk_number || '—',
+                          id: t.ticket_id || t.ticket_number || t.id || t.tk_number || '—',
                           name: t.customer_name || t.customer || t.name || '—',
                           issue: t.issue_type || t.issue || t.category || t.issue_summary || '—',
-                          heat: t.heat || 'Cold',
-                          heatColor: t.heat_color_hex || { Hot: '#ef4444', Warm: '#f59e0b', Cold: '#3b82f6' }[t.heat || 'Cold'] || '#3b82f6',
+                          heat: t.heat_rating || t.heat || 'Cold',
+                          heatColor: t.heat_color_hex || { Hot: '#ef4444', Warm: '#f59e0b', Cold: '#3b82f6' }[t.heat_rating || t.heat || 'Cold'] || '#3b82f6',
                           transcript: t.transcript_snippet || t.snippet || t.transcript || 'No transcript available.'
                         };
                         return (
@@ -1483,6 +1518,7 @@ export default function App() {
                     </tbody>
                   </table>
                   </div>
+                  <PaginationControls page={ticketPage} pageCount={ticketPageCount} onPageChange={setTicketPage} />
                 </div>
               </div>
 
